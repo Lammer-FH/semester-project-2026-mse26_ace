@@ -13,9 +13,6 @@ See [team.md](team.md) for team members.
 - [Web Protoype](ACE_FirstPrototype.pdf)
 - [Mobile Prototype](ACEEscapes_Mobile_Prototype.pdf)
 
-- [Web Protoype](ACE_FirstPrototype.pdf)
-- [Mobile Prototype](ACEEscapes_Mobile_Prototype.pdf)
-
 ## Tech Stack
 - **Backend:** Java, Spring Boot 3
 - **Frontend:** Ionic, Vue 3, Pinia, Axios
