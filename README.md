@@ -14,6 +14,20 @@ See [team.md](team.md) for team members.
 - [Mobile Prototype](Docs/ACEEscapes_Mobile_Prototype.pdf)
 
 ## Tech Stack
-- **Backend:** Java, Spring Boot 3
-- **Frontend:** Ionic, Vue 3, Pinia, Axios
-- **Database:** MySQL
+
+**Backend**
+- Java mit Spring Boot 3
+- MySQL als Datenbank
+- Clean Architecture nach Robert C. Martin
+- REST API auf Richardson Maturity Level 2
+
+**Frontend**
+- Vue 3 mit Ionic Framework
+- Pinia für State Management
+- Axios für API Calls
+- Atomic Design für Komponentenstruktur
+
+**Tooling**
+- GitHub Classroom
+- GitHub Projects (Kanban)
+- Figma und Claude Design für Prototypen
