@@ -7,8 +7,12 @@ See [team.md](team.md) for team members.
  
 ## Docs
 - [API Specification](Docs/ACE_Escapes_Hotel_Booking_API.pdf) using Swagger.io OpenAPI 3.0
-- [ER Diagram](Docs/ACEEscapes_ER.png) Database model using Draw.io:
-<img width="901" height="331" alt="ACEEscapes_ER" src="https://github.com/user-attachments/assets/e2adf6b4-8fce-49d3-bfa4-0612cf543fbd" />
+- [ER Diagram](Docs/ACEEscapes_diagram.png) Database model using Draw.io:
+![ER Diagram](Docs/ACEEscapes_diagram.png)
+
+The ER diagram represents the database structure of ACE Escapes and was updated based on the feedback we received. The model keeps the core entities for rooms, guests and bookings with clear primary and foreign key notation, typed columns and timestamps.
+
+Based on the feedback, the former comma-separated `extras` field was normalized into a separate `extras` table and a `room_extras` junction table. This avoids slow and error-prone text searches, enables referential integrity and makes room features easier to maintain. In addition, monetary values such as `price_per_night` are modeled with `DECIMAL` instead of `FLOAT` to avoid rounding issues. The booking model also includes a `status` field to support booking states such as confirmed or cancelled without deleting historical records.
 
 - [Web Protoype](Docs/ACE_FirstPrototype.pdf)
 - [Mobile Prototype](Docs/ACEEscapes_Mobile_Prototype.pdf)
