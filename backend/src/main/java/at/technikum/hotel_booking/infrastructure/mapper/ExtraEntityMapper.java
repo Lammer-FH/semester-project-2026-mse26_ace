@@ -1,23 +1,21 @@
 package at.technikum.hotel_booking.infrastructure.mapper;
 
-import at.technikum.hotel_booking.domain.model.RoomImage;
-import at.technikum.hotel_booking.infrastructure.entity.RoomImageEntity;
+import at.technikum.hotel_booking.domain.model.Extra;
 
-public final class RoomImageEntityMapper {
-    private RoomImageEntityMapper() {
+public final class ExtraEntityMapper {
+    private ExtraEntityMapper() {
         // Private constructor to prevent instantiation
     }
-    public static RoomImage toDomain(RoomImageEntity roomImageEntity) {
-        if (roomImageEntity == null) {
+    
+    public static Extra toDomain(at.technikum.hotel_booking.infrastructure.entity.ExtraEntity extraEntity) {
+        if (extraEntity == null) {
             return null;
         }
-        return new RoomImage(
-                roomImageEntity.getId(),
-                roomImageEntity.getUrl(),
-                roomImageEntity.getAltText(),
-                roomImageEntity.isMainImage(),
-                roomImageEntity.getImageOrder(),
-                roomImageEntity.getRoom() != null ? roomImageEntity.getRoom().getId() : null
+        return new Extra(
+                extraEntity.getId(),
+                extraEntity.getName(),
+                extraEntity.getDescription(),
+                extraEntity.getIconName()
         );
     }
 }

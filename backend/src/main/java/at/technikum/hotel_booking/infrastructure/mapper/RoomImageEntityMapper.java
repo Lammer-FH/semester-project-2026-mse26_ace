@@ -13,11 +13,9 @@ public final class RoomImageEntityMapper {
         }
         return new RoomImage(
                 roomImageEntity.getId(),
-                roomImageEntity.getUrl(),
-                roomImageEntity.getAltText(),
-                roomImageEntity.isMainImage(),
+                roomImageEntity.getImageUrl(),
                 roomImageEntity.getImageOrder(),
-                roomImageEntity.getRoom() != null ? roomImageEntity.getRoom().getId() : null
+                roomImageEntity.isMainImage()
         );
     }
 }

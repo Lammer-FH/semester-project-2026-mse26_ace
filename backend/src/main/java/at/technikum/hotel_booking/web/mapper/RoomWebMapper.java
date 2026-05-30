@@ -1,9 +1,14 @@
 package at.technikum.hotel_booking.web.mapper;
 
-import at.technikum.hotel_booking.domain.model.*;
-import at.technikum.hotel_booking.web.dto.*;
 import java.util.ArrayList;
 import java.util.List;
+
+import at.technikum.hotel_booking.domain.model.Extra;
+import at.technikum.hotel_booking.domain.model.Room;
+import at.technikum.hotel_booking.domain.model.RoomImage;
+import at.technikum.hotel_booking.web.dto.ExtraResponse;
+import at.technikum.hotel_booking.web.dto.RoomImageResponse;
+import at.technikum.hotel_booking.web.dto.RoomResponse;
 
 public final class RoomWebMapper{
     private RoomWebMapper(){
@@ -22,8 +27,8 @@ public final class RoomWebMapper{
         }
 
         return new RoomResponse(
-            room.getId,
-            room.getTitle,
+            room.getId(),
+            room.getTitle(),
             room.getDescription(),
             room.getPricePerNight(),
             room.getCapacity(),
@@ -36,8 +41,8 @@ public final class RoomWebMapper{
     private static RoomImageResponse toResponse(RoomImage image){
         return new RoomImageResponse(
             image.getId(),
-            image.getFilePath(),
-            image.isPriamry()
+            image.getUrl(),
+            image.isMainImage()
         );
     }
 
