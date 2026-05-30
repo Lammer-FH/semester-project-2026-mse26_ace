@@ -53,47 +53,15 @@
           <div class="booking-box">
             <h2>Select your stay</h2>
 
-            <ion-button
-              expand="block"
-              fill="outline"
-              @click="showCheckInPicker = true"
-            >
-              Check-in: {{ formatDate(checkInDate) || "Select date" }}
-            </ion-button>
+            <p class="calendar-instruction">
+              {{ calendarInstruction }}
+            </p>
 
-            <ion-button
-              expand="block"
-              fill="outline"
-              @click="showCheckOutPicker = true"
-            >
-              Check-out: {{ formatDate(checkOutDate) || "Select date" }}
-            </ion-button>
-
-            <ion-modal
-              :is-open="showCheckInPicker"
-              @didDismiss="showCheckInPicker = false"
-            >
-              <ion-content class="date-modal-content">
-                <ion-datetime
-                  presentation="date"
-                  v-model="checkInDate"
-                  @ionChange="showCheckInPicker = false"
-                ></ion-datetime>
-              </ion-content>
-            </ion-modal>
-
-            <ion-modal
-              :is-open="showCheckOutPicker"
-              @didDismiss="showCheckOutPicker = false"
-            >
-              <ion-content class="date-modal-content">
-                <ion-datetime
-                  presentation="date"
-                  v-model="checkOutDate"
-                  @ionChange="showCheckOutPicker = false"
-                ></ion-datetime>
-              </ion-content>
-            </ion-modal>
+            <ion-datetime
+              presentation="date"
+              :value="calendarValue"
+              @ionChange="selectCalendarDate($event.detail.value)"
+            ></ion-datetime>
 
             <p v-if="dateError" class="error">
               The check-out date cannot be before the check-in date.
@@ -107,6 +75,10 @@
               <br />
               {{ numberOfNights }} night{{ numberOfNights === 1 ? "" : "s" }} ·
               {{ formatDate(checkInDate) }} → {{ formatDate(checkOutDate) }}
+
+              <button class="reset-button" @click="resetDates">
+                Reset
+              </button>
             </div>
 
             <ion-button
@@ -143,8 +115,6 @@
             <p v-if="availabilityError" class="error">
               Availability could not be checked. Please try again later.
             </p>
-
-           
           </div>
         </div>
       </section>
@@ -153,156 +123,196 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
-import { useRoute } from "vue-router";
-import AppHeader from "../components/AppHeader.vue";
+import { computed, onMounted, ref } from "vue"
+import { useRoute } from "vue-router"
+import AppHeader from "../components/AppHeader.vue"
 
 import {
   IonPage,
   IonContent,
   IonButton,
-  IonModal,
-  IonDatetime,
-} from "@ionic/vue";
+  IonDatetime
+} from "@ionic/vue"
 
 import {
   getRoomById,
   checkRoomAvailability,
-  type Room,
-} from "../services/roomService";
+  type Room
+} from "../services/roomService"
 
-const route = useRoute();
-const roomId = route.params.id as string;
+const route = useRoute()
+const roomId = route.params.id as string
 
-const room = ref<Room | null>(null);
-const loading = ref(false);
-const error = ref(false);
+const room = ref<Room | null>(null)
+const loading = ref(false)
+const error = ref(false)
 
-const checkInDate = ref("");
-const checkOutDate = ref("");
+const checkInDate = ref("")
+const checkOutDate = ref("")
 
-const showCheckInPicker = ref(false);
-const showCheckOutPicker = ref(false);
+const availabilityLoading = ref(false)
+const availabilityError = ref(false)
+const availabilityChecked = ref(false)
+const isAvailable = ref<boolean | null>(null)
+const dateMissingError = ref(false)
 
-const availabilityLoading = ref(false);
-const availabilityError = ref(false);
-const availabilityChecked = ref(false);
-const isAvailable = ref<boolean | null>(null);
-const dateMissingError = ref(false);
+const calendarValue = computed(() => {
+  return checkOutDate.value || checkInDate.value || ""
+})
+
+const calendarInstruction = computed(() => {
+  if (!checkInDate.value) {
+    return "Select your check-in date."
+  }
+
+  if (!checkOutDate.value) {
+    return "Now select your check-out date."
+  }
+
+  return "Your stay period is selected. Click another date to start again."
+})
 
 const dateError = computed(() => {
   if (!checkInDate.value || !checkOutDate.value) {
-    return false;
+    return false
   }
 
-  return checkOutDate.value < checkInDate.value;
-});
+  return toApiDate(checkOutDate.value) < toApiDate(checkInDate.value)
+})
 
 const numberOfNights = computed(() => {
   if (!checkInDate.value || !checkOutDate.value || dateError.value) {
-    return 0;
+    return 0
   }
 
-  const start = new Date(checkInDate.value);
-  const end = new Date(checkOutDate.value);
+  const start = new Date(toApiDate(checkInDate.value) + "T00:00:00")
+  const end = new Date(toApiDate(checkOutDate.value) + "T00:00:00")
 
-  const difference = end.getTime() - start.getTime();
+  const difference = end.getTime() - start.getTime()
 
-  return difference / (1000 * 60 * 60 * 24);
-});
-
-const canContinue = computed(() => {
-  return (
-    checkInDate.value &&
-    checkOutDate.value &&
-    !dateError.value &&
-    numberOfNights.value > 0
-  );
-});
+  return difference / (1000 * 60 * 60 * 24)
+})
 
 async function loadRoom() {
-  loading.value = true;
-  error.value = false;
+  loading.value = true
+  error.value = false
 
   try {
-    room.value = await getRoomById(roomId);
+    room.value = await getRoomById(roomId)
   } catch {
-    error.value = true;
+    error.value = true
   } finally {
-    loading.value = false;
+    loading.value = false
   }
 }
 
+function selectCalendarDate(value: string | string[] | null | undefined) {
+  if (typeof value !== "string") {
+    return
+  }
+
+  if (!checkInDate.value || checkOutDate.value) {
+    checkInDate.value = value
+    checkOutDate.value = ""
+  } else {
+    checkOutDate.value = value
+  }
+
+  availabilityError.value = false
+  availabilityChecked.value = false
+  dateMissingError.value = false
+  isAvailable.value = null
+}
+
+function resetDates() {
+  checkInDate.value = ""
+  checkOutDate.value = ""
+
+  availabilityError.value = false
+  availabilityChecked.value = false
+  dateMissingError.value = false
+  isAvailable.value = null
+}
+
 function getMainImage(room: Room) {
-  const mainImage = room.images?.find((image) => image.isMainImage);
+  const mainImage = room.images?.find((image) => image.isMainImage)
 
   return (
     mainImage?.url ||
     "https://images.unsplash.com/photo-1566665797739-1674de7a421a"
-  );
+  )
 }
 
 function getExtraIcon(iconName: string) {
-  if (iconName === "wifi") return "📶";
-  if (iconName === "coffee") return "☕";
-  if (iconName === "car") return "🅿️";
-  if (iconName === "tv") return "📺";
-  if (iconName === "wind") return "❄️";
-  if (iconName === "spa") return "🧖";
+  if (iconName === "wifi") return "📶"
+  if (iconName === "coffee") return "☕"
+  if (iconName === "car") return "🅿️"
+  if (iconName === "tv") return "📺"
+  if (iconName === "wind") return "❄️"
+  if (iconName === "spa") return "🧖"
 
-  return "✨";
+  return "✨"
 }
 
 function formatDate(date: string) {
   if (!date) {
-    return "";
+    return ""
   }
 
-  const dateObject = new Date(date);
+  const dateOnly = toApiDate(date)
+  const dateObject = new Date(dateOnly + "T00:00:00")
 
   return dateObject.toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
-    year: "numeric",
-  });
+    year: "numeric"
+  })
 }
 
-onMounted(() => {
-  loadRoom();
-});
-
 async function handleCheckAvailability() {
-  dateMissingError.value = false;
-  availabilityError.value = false;
-  availabilityChecked.value = false;
-  isAvailable.value = null;
+  dateMissingError.value = false
+  availabilityError.value = false
+  availabilityChecked.value = false
+  isAvailable.value = null
 
   if (!checkInDate.value || !checkOutDate.value) {
-    dateMissingError.value = true;
-    return;
+    dateMissingError.value = true
+    return
   }
 
   if (dateError.value) {
-    return;
+    return
   }
 
-  availabilityLoading.value = true;
+  availabilityLoading.value = true
 
   try {
     const result = await checkRoomAvailability(
       roomId,
-      checkInDate.value,
-      checkOutDate.value,
-    );
+      toApiDate(checkInDate.value),
+      toApiDate(checkOutDate.value)
+    )
 
-    isAvailable.value = result.available;
-    availabilityChecked.value = true;
+    isAvailable.value = result.available
+    availabilityChecked.value = true
   } catch {
-    availabilityError.value = true;
+    availabilityError.value = true
   } finally {
-    availabilityLoading.value = false;
+    availabilityLoading.value = false
   }
 }
+
+function toApiDate(date: string) {
+  if (!date) {
+    return ""
+  }
+
+  return date.split("T")[0]
+}
+
+onMounted(() => {
+  loadRoom()
+})
 </script>
 
 <style scoped>
@@ -360,17 +370,19 @@ h1 {
 }
 
 .booking-box ion-button {
+  margin-top: 16px;
+}
+
+.calendar-instruction {
+  color: #555;
+  font-size: 15px;
   margin-bottom: 12px;
 }
 
-.date-modal-content {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-ion-datetime {
-  margin: 24px auto;
+.booking-box ion-datetime {
+  width: 100%;
+  max-width: 360px;
+  margin: 0 auto 16px;
 }
 
 .error {
@@ -387,10 +399,40 @@ ion-datetime {
   line-height: 1.5;
 }
 
+.reset-button {
+  display: block;
+  margin-top: 12px;
+  border: none;
+  background: transparent;
+  color: #0054e9;
+  text-decoration: underline;
+  font-size: 15px;
+  cursor: pointer;
+  padding: 0;
+}
+
 .hint {
   color: #666;
   font-size: 14px;
   margin-top: 12px;
+}
+
+.availability-result {
+  padding: 12px;
+  border-radius: 12px;
+  margin-top: 16px;
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+.availability-result.available {
+  background-color: #e8f5e9;
+  color: #1b5e20;
+}
+
+.availability-result.unavailable {
+  background-color: #ffebee;
+  color: #b71c1c;
 }
 
 @media (min-width: 768px) {
@@ -421,23 +463,4 @@ ion-datetime {
     height: 220px;
   }
 }
-
-.availability-result {
-  padding: 12px;
-  border-radius: 12px;
-  margin-top: 16px;
-  line-height: 1.5;
-  font-weight: 500;
-}
-
-.availability-result.available {
-  background-color: #e8f5e9;
-  color: #1b5e20;
-}
-
-.availability-result.unavailable {
-  background-color: #ffebee;
-  color: #b71c1c;
-}
 </style>
-
