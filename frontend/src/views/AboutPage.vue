@@ -7,14 +7,14 @@
         <h1>About Our Hotel</h1>
 
         <p>
-          ACE Escapes is a small boutique hotel created for guests who want a
+          Hotel Technikum is a small boutique hotel created for guests who want a
           comfortable and relaxing stay. Our goal is to offer a calm atmosphere,
           friendly service and modern rooms for short trips, holidays and city visits.
         </p>
 
         <p>
           The hotel combines simple design with everything guests need during their
-          stay. Whether you travel alone, as a couple or with your family, ACE Escapes
+          stay. Whether you travel alone, as a couple or with your family, Hotel Technikum
           helps you find a room that fits your needs.
         </p>
 

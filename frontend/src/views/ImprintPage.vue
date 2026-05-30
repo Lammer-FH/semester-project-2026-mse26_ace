@@ -9,7 +9,7 @@ P
 
         <h2>Hotel Information</h2>
         <p>
-          ACE Escapes Boutique Hotel<br />
+          Hotel Technikum Boutique Hotel<br />
           Technikumstraße 10<br />
           1200 Vienna<br />
           Austria
@@ -17,13 +17,13 @@ P
 
         <h2>Contact</h2>
         <p>
-          Email: contact@ace-escapes.example<br />
+          Email: contact@hotel-technikum.example<br />
           Phone: +43 1 234 5678
         </p>
 
         <h2>Responsible for this website</h2>
         <p>
-          ACE Escapes Team<br />
+          AceEscapes Team<br />
           Advanced Web Frameworks 2026
         </p>
       </section>

@@ -1,7 +1,7 @@
 <template>
   <ion-header>
     <ion-toolbar>
-      <ion-title>ACE Escapes</ion-title>
+      <ion-title>Hotel Technikum</ion-title>
     </ion-toolbar>
 
     <ion-toolbar class="nav-toolbar">
