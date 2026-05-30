@@ -25,8 +25,7 @@ stored as `DECIMAL` instead of `FLOAT` so there are no rounding issues with the 
 
 **Backend**
 - Java 17 with Spring Boot 3
-- MariaDB as the database
-- Clean Architecture (Robert C. Martin)
+- MariaDB as the database (We picked mariadb because it is easier to install on Linux and still is compatible with MySql for other members)
 - REST API at Richardson Maturity Level 2
 
 **Frontend**
