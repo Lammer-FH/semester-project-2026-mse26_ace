@@ -1,21 +1,39 @@
 package at.technikum.hotel_booking.infrastructure.repository;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.stereotype.Component;
-
 import at.technikum.hotel_booking.domain.model.BookingPeriod;
 import at.technikum.hotel_booking.domain.port.BookingRepository;
+import at.technikum.hotel_booking.infrastructure.entity.BookingEntity;
+import org.springframework.stereotype.Component;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @Component
 public class BookingRepositoryAdapter implements BookingRepository {
 
-    @Override
-    public List <BookingPeriod> findOverlappingBookings(Long roomId, LocalDate checkIn, LocalDate checkOut) {
-        // Implementation to fetch booked periods for the given room ID from the database
-        // This is a placeholder implementation and should be replaced with actual database access code
-        return new ArrayList<>();
+    private final BookingJpaRepository bookingJpaRepository;
+
+    public BookingRepositoryAdapter(BookingJpaRepository bookingJpaRepository) {
+        this.bookingJpaRepository = bookingJpaRepository;
     }
+
+    @Override
+    public List<BookingPeriod> findOverlappingBookings(
+            Long roomId,
+            LocalDate checkInDate,
+            LocalDate checkOutDate
+    ) {
+        return bookingJpaRepository
+                .findOverlappingBookings(roomId, checkInDate, checkOutDate)
+                .stream()
+                .map(this::toBookingPeriod)
+                .toList();
+    }
+
+    private BookingPeriod toBookingPeriod(BookingEntity bookingEntity) {
+    return new BookingPeriod(
+            bookingEntity.getCheckIn(),
+            bookingEntity.getCheckOut()
+    );
+}
 }
