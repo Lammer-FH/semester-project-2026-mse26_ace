@@ -12,7 +12,8 @@ import at.technikum.hotel_booking.domain.model.Room;
 import at.technikum.hotel_booking.service.RoomService;
 import at.technikum.hotel_booking.web.dto.RoomResponse;
 import at.technikum.hotel_booking.web.mapper.RoomWebMapper;
-
+import org.springframework.web.bind.annotation.CrossOrigin;
+@CrossOrigin(origins = "http://localhost:8100")
 @RestController
 @RequestMapping("/api/rooms")
 public class RoomController {
