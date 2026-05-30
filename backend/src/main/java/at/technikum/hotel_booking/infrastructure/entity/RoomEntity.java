@@ -28,7 +28,7 @@ public class RoomEntity {
     
     @Column(name = "title", nullable = false)
     private String title;
-    @Column(name = "description", nullable = false)
+    @Column(name = "description")
     private String description;
     @Column(name = "price_per_night", nullable = false)
     private BigDecimal pricePerNight;
@@ -42,7 +42,7 @@ public class RoomEntity {
     @JoinTable(
         name = "room_extras",
         joinColumns = @JoinColumn(name = "room_id"),
-        inverseJoinColumns = @JoinColumn(name = "extras_id")
+        inverseJoinColumns = @JoinColumn(name = "extra_id")
     )
     private Set<ExtraEntity> extrasSet = new HashSet<>();
 
