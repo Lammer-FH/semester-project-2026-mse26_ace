@@ -4,7 +4,6 @@ package at.technikum.hotel_booking.infrastructure.mapper;
 import at.technikum.hotel_booking.domain.model.Room;
 import at.technikum.hotel_booking.infrastructure.entity.RoomEntity;
 
-import java.util.List;
 
 public final class RoomEntityMapper {
    private RoomEntityMapper() {
@@ -17,8 +16,8 @@ public final class RoomEntityMapper {
         }
         return new Room(
                 roomEntity.getId(),
-                roomEntity.getNumber(),
-                roomEntity.getType(),
+                roomEntity.getTitle(),
+                roomEntity.getDescription(),
                 roomEntity.getPricePerNight(),
                 roomEntity.getCapacity(),
                 roomEntity.getSizeSqm(),
