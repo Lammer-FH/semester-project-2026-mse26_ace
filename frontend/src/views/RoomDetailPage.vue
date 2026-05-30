@@ -1,6 +1,6 @@
 <template>
   <ion-page>
-      <AppHeader />
+    <AppHeader />
 
     <ion-content>
       <section class="detail-page">
@@ -10,59 +10,141 @@
 
         <h1>Room Details</h1>
 
-        <p class="hint">
-          Room ID: {{ roomId }}
+        <p v-if="loading">Loading room...</p>
+
+        <p v-if="error" class="error">
+          Room could not be loaded. Please try again later.
         </p>
 
-        <div class="detail-layout">
+        <div v-if="room && !loading && !error" class="detail-layout">
           <div class="room-info">
             <img
-              src="https://images.unsplash.com/photo-1566665797739-1674de7a421a"
-              alt="Hotel room"
+              :src="getMainImage(room)"
+              :alt="room.title"
               class="room-image"
             />
 
-            <h2>Selected Room</h2>
+            <h2>{{ room.title }}</h2>
 
             <p>
-              Here the selected room information will be displayed later.
-              The data will come from the backend API.
+              {{ room.description }}
+            </p>
+
+            <p class="room-meta">
+              <strong>Price:</strong> €{{ room.pricePerNight }} per night
+            </p>
+
+            <p class="room-meta">
+              <strong>Capacity:</strong>
+              {{ room.capacity }} guest{{ room.capacity === 1 ? "" : "s" }}
+            </p>
+
+            <p class="room-meta">
+              <strong>Size:</strong> {{ room.sizeSqm }} m²
             </p>
 
             <div class="extras">
-              <span>📶 WiFi</span>
-              <span>📺 TV</span>
-              <span>☕ Breakfast</span>
+              <span v-for="extra in room.extras" :key="extra.id">
+                {{ getExtraIcon(extra.iconName) }} {{ extra.name }}
+              </span>
             </div>
           </div>
 
           <div class="booking-box">
             <h2>Select your stay</h2>
 
-            <div class="date-field">
-              <label for="checkIn">Check-in date</label>
-              <input id="checkIn" type="date" v-model="checkInDate" />
-            </div>
+            <ion-button
+              expand="block"
+              fill="outline"
+              @click="showCheckInPicker = true"
+            >
+              Check-in: {{ formatDate(checkInDate) || "Select date" }}
+            </ion-button>
 
-            <div class="date-field">
-              <label for="checkOut">Check-out date</label>
-              <input id="checkOut" type="date" v-model="checkOutDate" />
-            </div>
+            <ion-button
+              expand="block"
+              fill="outline"
+              @click="showCheckOutPicker = true"
+            >
+              Check-out: {{ formatDate(checkOutDate) || "Select date" }}
+            </ion-button>
+
+            <ion-modal
+              :is-open="showCheckInPicker"
+              @didDismiss="showCheckInPicker = false"
+            >
+              <ion-content class="date-modal-content">
+                <ion-datetime
+                  presentation="date"
+                  v-model="checkInDate"
+                  @ionChange="showCheckInPicker = false"
+                ></ion-datetime>
+              </ion-content>
+            </ion-modal>
+
+            <ion-modal
+              :is-open="showCheckOutPicker"
+              @didDismiss="showCheckOutPicker = false"
+            >
+              <ion-content class="date-modal-content">
+                <ion-datetime
+                  presentation="date"
+                  v-model="checkOutDate"
+                  @ionChange="showCheckOutPicker = false"
+                ></ion-datetime>
+              </ion-content>
+            </ion-modal>
 
             <p v-if="dateError" class="error">
               The check-out date cannot be before the check-in date.
             </p>
 
-            <div v-if="checkInDate && checkOutDate && !dateError" class="selected-period">
+            <div
+              v-if="checkInDate && checkOutDate && !dateError"
+              class="selected-period"
+            >
               <strong>Selected period:</strong>
               <br />
-              {{ numberOfNights }} night{{ numberOfNights === 1 ? '' : 's' }} ·
+              {{ numberOfNights }} night{{ numberOfNights === 1 ? "" : "s" }} ·
               {{ formatDate(checkInDate) }} → {{ formatDate(checkOutDate) }}
             </div>
 
-            <ion-button expand="block" :disabled="!canContinue">
+            <ion-button
+              expand="block"
+              :disabled="availabilityLoading"
+              @click="handleCheckAvailability"
+            >
               Check availability
             </ion-button>
+
+            <p v-if="dateMissingError" class="error">
+              Please select a check-in and check-out date before checking
+              availability.
+            </p>
+
+            <p v-if="availabilityLoading" class="hint">
+              Checking availability...
+            </p>
+
+            <div
+              v-if="availabilityChecked && isAvailable === true"
+              class="availability-result available"
+            >
+              ✅ This room is available for your selected period.
+            </div>
+
+            <div
+              v-if="availabilityChecked && isAvailable === false"
+              class="availability-result unavailable"
+            >
+              ❌ This room is not available for your selected period.
+            </div>
+
+            <p v-if="availabilityError" class="error">
+              Availability could not be checked. Please try again later.
+            </p>
+
+           
           </div>
         </div>
       </section>
@@ -71,76 +153,159 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import { useRoute } from 'vue-router'
-import AppHeader from '../components/AppHeader.vue'
+import { computed, onMounted, ref } from "vue";
+import { useRoute } from "vue-router";
+import AppHeader from "../components/AppHeader.vue";
 
 import {
   IonPage,
   IonContent,
   IonButton,
-  IonButtons
-} from '@ionic/vue'
+  IonModal,
+  IonDatetime,
+} from "@ionic/vue";
 
-const route = useRoute()
+import {
+  getRoomById,
+  checkRoomAvailability,
+  type Room,
+} from "../services/roomService";
 
-const roomId = route.params.id
+const route = useRoute();
+const roomId = route.params.id as string;
 
-const checkInDate = ref('')
-const checkOutDate = ref('')
+const room = ref<Room | null>(null);
+const loading = ref(false);
+const error = ref(false);
+
+const checkInDate = ref("");
+const checkOutDate = ref("");
+
+const showCheckInPicker = ref(false);
+const showCheckOutPicker = ref(false);
+
+const availabilityLoading = ref(false);
+const availabilityError = ref(false);
+const availabilityChecked = ref(false);
+const isAvailable = ref<boolean | null>(null);
+const dateMissingError = ref(false);
 
 const dateError = computed(() => {
   if (!checkInDate.value || !checkOutDate.value) {
-    return false
+    return false;
   }
 
-  return checkOutDate.value < checkInDate.value
-})
+  return checkOutDate.value < checkInDate.value;
+});
 
 const numberOfNights = computed(() => {
   if (!checkInDate.value || !checkOutDate.value || dateError.value) {
-    return 0
+    return 0;
   }
 
-  const start = new Date(checkInDate.value)
-  const end = new Date(checkOutDate.value)
+  const start = new Date(checkInDate.value);
+  const end = new Date(checkOutDate.value);
 
-  const difference = end.getTime() - start.getTime()
+  const difference = end.getTime() - start.getTime();
 
-  return difference / (1000 * 60 * 60 * 24)
-})
+  return difference / (1000 * 60 * 60 * 24);
+});
 
 const canContinue = computed(() => {
-  return checkInDate.value && checkOutDate.value && !dateError.value && numberOfNights.value > 0
-})
+  return (
+    checkInDate.value &&
+    checkOutDate.value &&
+    !dateError.value &&
+    numberOfNights.value > 0
+  );
+});
+
+async function loadRoom() {
+  loading.value = true;
+  error.value = false;
+
+  try {
+    room.value = await getRoomById(roomId);
+  } catch {
+    error.value = true;
+  } finally {
+    loading.value = false;
+  }
+}
+
+function getMainImage(room: Room) {
+  const mainImage = room.images?.find((image) => image.isMainImage);
+
+  return (
+    mainImage?.url ||
+    "https://images.unsplash.com/photo-1566665797739-1674de7a421a"
+  );
+}
+
+function getExtraIcon(iconName: string) {
+  if (iconName === "wifi") return "📶";
+  if (iconName === "coffee") return "☕";
+  if (iconName === "car") return "🅿️";
+  if (iconName === "tv") return "📺";
+  if (iconName === "wind") return "❄️";
+  if (iconName === "spa") return "🧖";
+
+  return "✨";
+}
 
 function formatDate(date: string) {
   if (!date) {
-    return ''
+    return "";
   }
 
-  const dateObject = new Date(date)
+  const dateObject = new Date(date);
 
-  return dateObject.toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric'
-  })
+  return dateObject.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
+onMounted(() => {
+  loadRoom();
+});
+
+async function handleCheckAvailability() {
+  dateMissingError.value = false;
+  availabilityError.value = false;
+  availabilityChecked.value = false;
+  isAvailable.value = null;
+
+  if (!checkInDate.value || !checkOutDate.value) {
+    dateMissingError.value = true;
+    return;
+  }
+
+  if (dateError.value) {
+    return;
+  }
+
+  availabilityLoading.value = true;
+
+  try {
+    const result = await checkRoomAvailability(
+      roomId,
+      checkInDate.value,
+      checkOutDate.value,
+    );
+
+    isAvailable.value = result.available;
+    availabilityChecked.value = true;
+  } catch {
+    availabilityError.value = true;
+  } finally {
+    availabilityLoading.value = false;
+  }
 }
 </script>
 
 <style scoped>
-.nav-toolbar {
-  --min-height: 44px;
-}
-
-.nav-buttons {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  gap: 4px;
-}
-
 .detail-page {
   padding: 20px;
   max-width: 1100px;
@@ -149,11 +314,6 @@ function formatDate(date: string) {
 
 h1 {
   font-size: 32px;
-  margin-bottom: 8px;
-}
-
-.hint {
-  color: #666;
   margin-bottom: 24px;
 }
 
@@ -179,11 +339,16 @@ h1 {
   margin-bottom: 16px;
 }
 
+.room-meta {
+  color: #555;
+  margin-bottom: 8px;
+}
+
 .extras {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-top: 12px;
+  margin-top: 16px;
 }
 
 .extras span {
@@ -194,25 +359,18 @@ h1 {
   font-size: 14px;
 }
 
-.date-field {
-  margin-bottom: 16px;
+.booking-box ion-button {
+  margin-bottom: 12px;
 }
 
-.date-field label {
-  display: block;
-  font-size: 14px;
-  margin-bottom: 6px;
-  color: #555;
+.date-modal-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.date-field input {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #cccccc;
-  border-radius: 10px;
-  font-size: 16px;
-  background-color: white;
-  color: #222;
+ion-datetime {
+  margin: 24px auto;
 }
 
 .error {
@@ -227,6 +385,12 @@ h1 {
   border-radius: 12px;
   margin: 16px 0;
   line-height: 1.5;
+}
+
+.hint {
+  color: #666;
+  font-size: 14px;
+  margin-top: 12px;
 }
 
 @media (min-width: 768px) {
@@ -256,9 +420,24 @@ h1 {
   .room-image {
     height: 220px;
   }
+}
 
-  .nav-buttons ion-button {
-    font-size: 13px;
-  }
+.availability-result {
+  padding: 12px;
+  border-radius: 12px;
+  margin-top: 16px;
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+.availability-result.available {
+  background-color: #e8f5e9;
+  color: #1b5e20;
+}
+
+.availability-result.unavailable {
+  background-color: #ffebee;
+  color: #b71c1c;
 }
 </style>
+
