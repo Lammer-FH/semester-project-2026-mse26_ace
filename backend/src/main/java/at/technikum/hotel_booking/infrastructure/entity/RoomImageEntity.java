@@ -22,14 +22,14 @@ public class RoomImageEntity {
     @JoinColumn(name = "room_id", nullable = false)
     private RoomEntity room;
     
-    @Column(name = "image_url", nullable = false)
-    private String imageUrl;
+    @Column(name = "file_path", nullable = false)
+    private String filePath;
 
-    @Column(name = "is_main_image", nullable = false)
-    private boolean isMainImage;
+    @Column(name = "is_primary", nullable = false)
+    private boolean isPrimary;
 
-    @Column(name = "image_order", nullable = false)
-    private int imageOrder;
+    @Column(name = "sort_order", nullable = false)
+    private int sortOrder;
 
     public Long getId() {
         return id;
@@ -47,27 +47,27 @@ public class RoomImageEntity {
         this.room = room;
     }
 
-    public String getImageUrl() {
-        return imageUrl;
+    public String getFilePath() {
+        return filePath;
     }
 
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
+    public void setFilePath(String imageUrl) {
+        this.filePath = imageUrl;
     }
 
-    public boolean isMainImage() {
-        return isMainImage;
+    public boolean isPrimary() {
+        return isPrimary;
     }
 
-    public void setMainImage(boolean isMainImage) {
-        this.isMainImage = isMainImage;
+    public void setPrimary(boolean isMainImage) {
+        this.isPrimary = isMainImage;
     }
 
-    public int getImageOrder() {
-        return imageOrder;
+    public int getSortOrder() {
+        return sortOrder;
     }
 
-    public void setImageOrder(int imageOrder) {
-        this.imageOrder = imageOrder;
+    public void setSortOrder(int sortOrder) {
+        this.sortOrder = sortOrder;
     }
 }

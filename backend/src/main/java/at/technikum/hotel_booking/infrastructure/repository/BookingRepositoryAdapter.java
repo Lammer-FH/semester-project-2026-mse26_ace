@@ -31,9 +31,9 @@ public class BookingRepositoryAdapter implements BookingRepository {
     }
 
     private BookingPeriod toBookingPeriod(BookingEntity bookingEntity) {
-        return new BookingPeriod(
-                bookingEntity.getCheckInDate(),
-                bookingEntity.getCheckOutDate()
-        );
-    }
+    return new BookingPeriod(
+            bookingEntity.getCheckIn(),
+            bookingEntity.getCheckOut()
+    );
+}
 }

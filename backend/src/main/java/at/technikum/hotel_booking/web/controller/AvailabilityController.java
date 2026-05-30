@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 
 @RestController
-@RequestMapping("/api/v1/rooms")
+@RequestMapping("/api/rooms")
 public class AvailabilityController {
 
     private final AvailabilityService availabilityService;

@@ -14,8 +14,8 @@ public interface BookingJpaRepository extends JpaRepository<BookingEntity, Long>
         SELECT booking
         FROM BookingEntity booking
         WHERE booking.room.id = :roomId
-        AND booking.checkInDate < :checkOutDate
-        AND booking.checkOutDate > :checkInDate
+        AND booking.checkIn < :checkOutDate
+        AND booking.checkOut > :checkInDate
     """)
     List<BookingEntity> findOverlappingBookings(
             @Param("roomId") Long roomId,

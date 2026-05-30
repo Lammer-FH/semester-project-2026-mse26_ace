@@ -15,9 +15,9 @@ public class ExtraEntity {
     private Long id;
     @Column(name = "name", unique = true, nullable = false)
     private String name;
-    @Column(name = "description", nullable = false)
+    @Column(name = "description")
     private String description;
-    @Column(name = "icon_name", nullable = false)
+    @Column(name = "icon_name")
     private String iconName;
 
     public Long getId() {
