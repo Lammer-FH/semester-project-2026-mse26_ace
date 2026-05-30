@@ -2,30 +2,30 @@ package at.technikum.hotel_booking.domain.model;
 
 public class RoomImage {
     private final Long id;
-    private final String url;
-    private final int order;
-    private final boolean isMainImage;
+    private final String filePath;
+    private final int sortOrder;
+    private final boolean isPrimary;
 
-    public RoomImage(Long id, String url, int order, boolean isMainImage) {
+    public RoomImage(Long id, String filePath, int sortOrder, boolean isPrimary) {
         this.id = id;
-        this.url = url;
-        this.order = order;
-        this.isMainImage = isMainImage;
+        this.filePath = filePath;
+        this.sortOrder = sortOrder;
+        this.isPrimary = isPrimary;
     }
 
     public Long getId() {
         return id;
     }
 
-    public String getUrl() {
-        return url;
+    public String getFilePath() {
+        return filePath;
     }
 
-    public int getOrder() {
-        return order;
+    public int getSortOrder() {
+        return sortOrder;
     }
 
-    public boolean isMainImage() {
-        return isMainImage;
+    public boolean isPrimary() {
+        return isPrimary;
     }
 }

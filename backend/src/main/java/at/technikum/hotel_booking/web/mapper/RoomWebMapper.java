@@ -41,8 +41,8 @@ public final class RoomWebMapper{
     private static RoomImageResponse toResponse(RoomImage image){
         return new RoomImageResponse(
             image.getId(),
-            image.getUrl(),
-            image.isMainImage()
+            image.getFilePath(),
+            image.isPrimary()
         );
     }
 
@@ -50,7 +50,8 @@ public final class RoomWebMapper{
         return new ExtraResponse(
             extra.getId(),
             extra.getName(),
-            extra.getIconName()
+            extra.getIconName(),
+            extra.getDescription()
         );
     }
 }

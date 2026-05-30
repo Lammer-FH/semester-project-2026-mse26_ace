@@ -23,17 +23,11 @@ public class BookingEntity {
     @JoinColumn(name = "room_id", nullable = false)
     private RoomEntity room;
     
-    @Column(name = "customer_name", nullable = false)
-    private String customerName;
+    @Column(name = "check_in", nullable = false)
+    private LocalDate checkIn;
     
-    @Column(name = "customer_email", nullable = false)
-    private String customerEmail;
-    
-    @Column(name = "check_in_date", nullable = false)
-    private LocalDate checkInDate;
-    
-    @Column(name = "check_out_date", nullable = false)
-    private LocalDate checkOutDate;
+    @Column(name = "check_out", nullable = false)
+    private LocalDate checkOut;
 
     // TODO U4: breakfast_included (boolean) hinzufuegen.
     // TODO U4: status als Enum (confirmed, paid, cancelled, completed) hinzufuegen.
@@ -55,36 +49,20 @@ public class BookingEntity {
         this.room = room;
     }
 
-    public String getCustomerName() {
-        return customerName;
+    public LocalDate getCheckIn() {
+        return checkIn;
     }
 
-    public void setCustomerName(String customerName) {
-        this.customerName = customerName;
+    public void setCheckIn(LocalDate checkIn) {
+        this.checkIn = checkIn;
     }
 
-    public String getCustomerEmail() {
-        return customerEmail;
+    public LocalDate getCheckOut() {
+        return checkOut;
     }
 
-    public void setCustomerEmail(String customerEmail) {
-        this.customerEmail = customerEmail;
-    }
-
-    public LocalDate getCheckInDate() {
-        return checkInDate;
-    }
-
-    public void setCheckInDate(LocalDate checkInDate) {
-        this.checkInDate = checkInDate;
-    }
-
-    public LocalDate getCheckOutDate() {
-        return checkOutDate;
-    }
-
-    public void setCheckOutDate(LocalDate checkOutDate) {
-        this.checkOutDate = checkOutDate;
+    public void setCheckOut(LocalDate checkOut) {
+        this.checkOut = checkOut;
     }
 
 }
