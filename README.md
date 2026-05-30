@@ -8,7 +8,7 @@ See [team.md](team.md).
 
 ## Docs
 
-- [API Specification](Docs/ACE_Escapes_Hotel_Booking_API.pdf) – OpenAPI 3.0, built with Swagger
+- [API Specification](Docs/ACE_Escapes_Hotel_Booking_API_v2.0.pdf) – OpenAPI 3.0, built with Swagger
 - [ER Diagram](Docs/ACEEscapes_diagram.png) – database model (Draw.io)
 - [Web Prototype](Docs/ACE_Webprototype.pdf)
 - [Mobile Prototype](Docs/ACEEscapes_MobileProtoype_v2.0.png)
