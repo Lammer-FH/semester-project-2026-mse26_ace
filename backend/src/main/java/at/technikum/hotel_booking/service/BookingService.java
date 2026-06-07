@@ -9,10 +9,8 @@ import at.technikum.hotel_booking.domain.port.BookingRepository;
 public class BookingService {
     
     private final BookingRepository bookingRepository;
-    private final AvailabilityService availabilityService;
 
-    public BookingService(AvailabilityService availabilityService, BookingRepository bookingRepository) {
-        this.availabilityService = availabilityService;
+    public BookingService(BookingRepository bookingRepository) {
         this.bookingRepository = bookingRepository;
     }
 
@@ -34,5 +32,9 @@ public class BookingService {
         return bookingRepository.save(booking);
     }
 
-    
+    public Booking getBookingById(Long id){
+        return bookingRepository.findById(id)
+            .orElseThrow(() -> new BookingNotFoundException("Booking with id "+id+" not found"));
+    }
+
 }
