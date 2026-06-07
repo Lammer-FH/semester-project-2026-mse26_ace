@@ -56,3 +56,38 @@ export async function checkRoomAvailability(
 
   return response.data
 }
+
+export type CreateBookingRequest = {
+  roomId: number
+  checkIn: string
+  checkOut: string
+  firstName: string
+  lastName: string
+  email: string
+  breakfast: boolean
+}
+
+export type BookingResponse = {
+  id: number
+  roomId: number
+  checkIn: string
+  checkout: string
+  firstName: string
+  lastName: string
+  email: string
+  breakfast: boolean
+  createdAt?: string
+priceAtBooking?: number
+status?: string
+}
+
+export async function createBooking(
+  booking: CreateBookingRequest
+): Promise<BookingResponse> {
+  const response = await axios.post<BookingResponse>(
+    `${API_BASE_URL}/bookings`,
+    booking
+  )
+
+  return response.data
+}

@@ -6,6 +6,7 @@ import AboutPage from '../views/AboutPage.vue'
 import ImprintPage from '../views/ImprintPage.vue'
 import RoomsPage from '../views/RoomsPage.vue'
 import RoomDetailPage from '../views/RoomDetailPage.vue'
+import BookingPage from "../views/BookingPage.vue"
 
 
 const routes: Array<RouteRecordRaw> = [
@@ -37,6 +38,11 @@ const routes: Array<RouteRecordRaw> = [
   path: '/rooms/:id',
   name: 'RoomDetail',
   component: RoomDetailPage
+},
+{
+  path: "/booking/:id",
+  name: "Booking",
+  component: BookingPage
 },
 ]
 
