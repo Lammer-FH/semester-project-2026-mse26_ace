@@ -41,5 +41,9 @@ CREATE TABLE IF NOT EXISTS bookings (
     room_id   BIGINT NOT NULL,
     check_in  DATE   NOT NULL,
     check_out DATE   NOT NULL,
+    first_name VARCHAR(100) NOT NULL,
+    last_name  VARCHAR(100) NOT NULL,
+    email      VARCHAR(255) NOT NULL,
+    breakfast  BOOLEAN      NOT NULL DEFAULT FALSE,
     CONSTRAINT fk_bookings_room FOREIGN KEY (room_id) REFERENCES rooms (id)
 );

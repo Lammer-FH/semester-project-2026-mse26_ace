@@ -1,20 +1,24 @@
 package at.technikum.hotel_booking.infrastructure.repository;
 
+import java.time.LocalDate;
+import java.util.List;
+
+import org.springframework.stereotype.Component;
+
+import at.technikum.hotel_booking.domain.model.Booking;
 import at.technikum.hotel_booking.domain.model.BookingPeriod;
 import at.technikum.hotel_booking.domain.port.BookingRepository;
 import at.technikum.hotel_booking.infrastructure.entity.BookingEntity;
-import org.springframework.stereotype.Component;
-
-import java.time.LocalDate;
-import java.util.List;
 
 @Component
 public class BookingRepositoryAdapter implements BookingRepository {
 
+    private final RoomJpaRepository roomJpaRepository;
     private final BookingJpaRepository bookingJpaRepository;
 
-    public BookingRepositoryAdapter(BookingJpaRepository bookingJpaRepository) {
+    public BookingRepositoryAdapter(BookingJpaRepository bookingJpaRepository, RoomJpaRepository roomJpaRepository) {
         this.bookingJpaRepository = bookingJpaRepository;
+        this.roomJpaRepository = roomJpaRepository;
     }
 
     @Override
@@ -36,4 +40,29 @@ public class BookingRepositoryAdapter implements BookingRepository {
             bookingEntity.getCheckOut()
     );
 }
+
+    @Override   
+    public Booking save(Booking booking) {
+        BookingEntity entity = new BookingEntity();
+        entity.setRoom(roomJpaRepository.findById(booking.getRoomId()).orElseThrow());
+        entity.setCheckIn(booking.getCheckIn());
+        entity.setCheckOut(booking.getCheckOut());
+        entity.setFirstName(booking.getFirstName());
+        entity.setLastName(booking.getLastName());
+        entity.setEmail(booking.getEmail());
+        entity.setBreakfast(booking.isBreakfast());
+
+        BookingEntity saved = bookingJpaRepository.save(entity);
+
+        return new Booking(
+            saved.getId(),
+            saved.getRoom().getId(),
+            saved.getCheckIn(),
+            saved.getCheckOut(),
+            saved.getFirstName(),
+            saved.getLastName(),
+            saved.getEmail(),
+            saved.isBreakfast()
+        );
+    }
 }
