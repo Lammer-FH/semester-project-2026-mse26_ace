@@ -1,6 +1,8 @@
 package at.technikum.hotel_booking.web.dto;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public record BookingResponse(
     Long id,
@@ -10,5 +12,7 @@ public record BookingResponse(
     String firstName,
     String lastName,
     String email,
-    boolean breakfast
+    boolean breakfast,
+    BigDecimal priceAtBooking,
+    LocalDateTime createdAt
 ) {}

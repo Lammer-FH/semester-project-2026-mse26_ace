@@ -19,7 +19,9 @@ public final class BookingEntityMapper {
             request.firstName(), 
             request.lastName(), 
             request.email(), 
-            request.breakfast()
+            request.breakfast(),
+            null,
+            null
         );
     }
 
@@ -32,7 +34,9 @@ public final class BookingEntityMapper {
             booking.getFirstName(),
             booking.getLastName(),
             booking.getEmail(),
-            booking.isBreakfast()
+            booking.isBreakfast(),
+            booking.getPriceAtBooking(),
+            booking.getCreatedAt()
         );
     }
 }

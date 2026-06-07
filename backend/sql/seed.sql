@@ -57,6 +57,6 @@ INSERT INTO room_extras (room_id, extra_id) VALUES
 
 -- Pre-baked unavailability for July 2026 to mirror the prototype
 INSERT INTO bookings (room_id, check_in, check_out, first_name, last_name, email, breakfast) VALUES
-    (1, '2026-07-02', '2026-07-05', 'Elaa', 'Ezzine', 'seed@example.com', TRUE),
-    (1, '2026-07-17', '2026-07-19', 'Chiara', 'Steiner', 'seed@example.com', FALSE),
-    (1, '2026-07-25', '2026-07-27', 'Max', 'Mustermann', 'seed@example.com', FALSE);
+    (1, '2026-07-02', '2026-07-05', 'Elaa', 'Ezzine', 'seed@example.com', TRUE, 130.00),
+    (1, '2026-07-17', '2026-07-19', 'Chiara', 'Steiner', 'seed@example.com', FALSE, 379.90),
+    (1, '2026-07-25', '2026-07-27', 'Max', 'Mustermann', 'seed@example.com', FALSE, 250.00);

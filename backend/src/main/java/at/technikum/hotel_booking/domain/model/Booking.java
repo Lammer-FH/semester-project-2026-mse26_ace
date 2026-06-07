@@ -1,6 +1,9 @@
 package at.technikum.hotel_booking.domain.model;
 
+import java.math.BigDecimal;
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class Booking {
     private final Long id;
@@ -11,9 +14,11 @@ public class Booking {
     private final String lastName;
     private final String email;
     private final boolean breakfast;
+    private final BigDecimal priceAtBooking;
+    private final LocalDateTime createdAt;
 
     public Booking(Long id, Long roomId, LocalDate checkIn, LocalDate checkOut, String firstName, String lastName,
-            String email, boolean breakfast) {
+            String email, boolean breakfast,BigDecimal priceAtBooking, LocalDateTime createdAt) {
         this.id = id;
         this.roomId = roomId;
         this.checkIn = checkIn;
@@ -22,6 +27,8 @@ public class Booking {
         this.lastName = lastName;
         this.email = email;
         this.breakfast = breakfast;
+        this.priceAtBooking= priceAtBooking;
+        this.createdAt= createdAt;
     }
 
     public Long getId() {
@@ -56,5 +63,11 @@ public class Booking {
         return breakfast;
     }
 
+    public BigDecimal getPriceAtBooking(){
+        return priceAtBooking;
+    }
+    public LocalDateTime getCreatedAt(){
+        return createdAt;
+    }
     
 }

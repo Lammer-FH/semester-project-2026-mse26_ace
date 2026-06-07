@@ -1,6 +1,8 @@
 package at.technikum.hotel_booking.infrastructure.entity;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -40,7 +42,14 @@ public class BookingEntity {
 
     @Column(name = "breakfast", nullable = false)
     private boolean breakfast;
-
+    
+    @Column(name = "price_at_booking", nullable = false)
+    private BigDecimal priceAtBooking;
+    
+    @Column(name = "created_at", nullable = false, updatable = false)
+    @org.hibernate.annotations.CreationTimestamp
+    private LocalDateTime createdAt;    
+    
     public Long getId() {
         return id;
     }
@@ -103,6 +112,22 @@ public class BookingEntity {
 
     public void setBreakfast(boolean breakfast) {
         this.breakfast = breakfast;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public BigDecimal getPriceAtBooking() {
+        return priceAtBooking;
+    }
+
+    public void setPriceAtBooking(BigDecimal priceAtBooking) {
+        this.priceAtBooking = priceAtBooking;
     }
 
     
