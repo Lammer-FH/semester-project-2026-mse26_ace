@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import at.technikum.hotel_booking.service.InvalidBookingException;
 import at.technikum.hotel_booking.service.RoomNotAvailableException;
 import at.technikum.hotel_booking.service.RoomNotFoundException;
+import at.technikum.hotel_booking.service.BookingNotFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -33,4 +34,11 @@ public class GlobalExceptionHandler {
             .status(HttpStatus.CONFLICT)
             .body(Map.of("error", ex.getMessage()));
     }
+
+    @ExceptionHandler(BookingNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleBookingNotFound(BookingNotFoundException ex) {
+    return ResponseEntity
+        .status(HttpStatus.NOT_FOUND)
+        .body(Map.of("error", ex.getMessage()));
+    }  
 }

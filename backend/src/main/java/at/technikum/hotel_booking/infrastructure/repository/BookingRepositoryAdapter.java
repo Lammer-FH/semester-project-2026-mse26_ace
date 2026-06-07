@@ -2,6 +2,7 @@ package at.technikum.hotel_booking.infrastructure.repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Component;
 
@@ -64,5 +65,20 @@ public class BookingRepositoryAdapter implements BookingRepository {
             saved.getEmail(),
             saved.isBreakfast()
         );
+    }
+
+    @Override
+    public Optional<Booking> findById(Long id) {
+        return bookingJpaRepository.findById(id)
+            .map(entity -> new Booking(
+                entity.getId(), 
+                entity.getRoom().getId(), 
+                entity.getCheckIn(), 
+                entity.getCheckOut(), 
+                entity.getFirstName(), 
+                entity.getLastName(),
+                entity.getEmail(), 
+                entity.isBreakfast()
+            ));
     }
 }
