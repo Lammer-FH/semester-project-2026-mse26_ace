@@ -45,5 +45,7 @@ CREATE TABLE IF NOT EXISTS bookings (
     last_name  VARCHAR(100) NOT NULL,
     email      VARCHAR(255) NOT NULL,
     breakfast  BOOLEAN      NOT NULL DEFAULT FALSE,
+    price_at_booking DECIMAL(10,2) NOT NULL,
+    created_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_bookings_room FOREIGN KEY (room_id) REFERENCES rooms (id)
 );

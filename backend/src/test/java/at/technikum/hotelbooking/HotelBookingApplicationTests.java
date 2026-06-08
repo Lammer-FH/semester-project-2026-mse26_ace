@@ -1,4 +1,4 @@
-package at.technikum.hotel_booking;
+package at.technikum.hotelbooking;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

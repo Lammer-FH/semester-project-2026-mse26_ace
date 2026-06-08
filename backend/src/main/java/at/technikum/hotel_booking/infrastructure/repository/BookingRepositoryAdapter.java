@@ -52,6 +52,7 @@ public class BookingRepositoryAdapter implements BookingRepository {
         entity.setLastName(booking.getLastName());
         entity.setEmail(booking.getEmail());
         entity.setBreakfast(booking.isBreakfast());
+        entity.setPriceAtBooking(booking.getPriceAtBooking());
 
         BookingEntity saved = bookingJpaRepository.save(entity);
 
@@ -63,7 +64,9 @@ public class BookingRepositoryAdapter implements BookingRepository {
             saved.getFirstName(),
             saved.getLastName(),
             saved.getEmail(),
-            saved.isBreakfast()
+            saved.isBreakfast(),
+            saved.getPriceAtBooking(),
+            saved.getCreatedAt()
         );
     }
 
@@ -78,7 +81,9 @@ public class BookingRepositoryAdapter implements BookingRepository {
                 entity.getFirstName(), 
                 entity.getLastName(),
                 entity.getEmail(), 
-                entity.isBreakfast()
+                entity.isBreakfast(),
+                entity.getPriceAtBooking(),
+                entity.getCreatedAt()
             ));
     }
 }

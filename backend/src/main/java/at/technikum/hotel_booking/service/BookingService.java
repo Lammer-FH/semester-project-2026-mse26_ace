@@ -1,17 +1,24 @@
 package at.technikum.hotel_booking.service;
 
-import org.springframework.stereotype.Service;
+import java.math.BigDecimal;
 
-import at.technikum.hotel_booking.domain.model.Booking;
+import java.time.temporal.ChronoUnit;
+
+import org.springframework.stereotype.Service;
 import at.technikum.hotel_booking.domain.port.BookingRepository;
+import at.technikum.hotel_booking.domain.port.RoomRepository;
+import at.technikum.hotel_booking.domain.model.Booking;
+import at.technikum.hotel_booking.domain.model.Room;
 
 @Service
 public class BookingService {
     
     private final BookingRepository bookingRepository;
+    private final RoomRepository roomRepository;
 
-    public BookingService(BookingRepository bookingRepository) {
+    public BookingService(BookingRepository bookingRepository, RoomRepository roomRepository) {
         this.bookingRepository = bookingRepository;
+        this.roomRepository = roomRepository;
     }
 
     public Booking createBooking(Booking booking){
@@ -29,7 +36,26 @@ public class BookingService {
             throw new RoomNotAvailableException("Room is not available for the selected period");
         }
 
-        return bookingRepository.save(booking);
+        Room room = roomRepository.findById(booking.getRoomId())
+            .orElseThrow(()-> new RoomNotFoundException("Room with id "+booking.getRoomId()+" not found"));
+        
+        long nights = ChronoUnit.DAYS.between(booking.getCheckIn(), booking.getCheckOut());
+        BigDecimal totalPrice = room.getPricePerNight().multiply(BigDecimal.valueOf(nights));
+        
+        Booking withPrice = new Booking(
+            booking.getId(),
+            booking.getRoomId(),
+            booking.getCheckIn(),
+            booking.getCheckOut(),
+            booking.getFirstName(),
+            booking.getLastName(),
+            booking.getEmail(),
+            booking.isBreakfast(),
+            totalPrice,
+            booking.getCreatedAt()
+        );
+
+        return bookingRepository.save(withPrice);
     }
 
     public Booking getBookingById(Long id){
