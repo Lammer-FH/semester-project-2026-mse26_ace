@@ -1,7 +1,7 @@
 <template>
   <ion-header>
     <ion-toolbar>
-      <ion-title>Hotel Technikum</ion-title>
+      <ion-title>Hotel Boutique</ion-title>
     </ion-toolbar>
 
     <ion-toolbar class="nav-toolbar">

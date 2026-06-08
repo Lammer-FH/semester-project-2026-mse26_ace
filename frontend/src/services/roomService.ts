@@ -1,42 +1,25 @@
-import axios from 'axios'
+import axios from "axios"
 
-const API_BASE_URL = 'http://localhost:8080/api'
+import type {
+  Room,
+  AvailabilityResult,
+  CreateBookingRequest,
+  BookingResponse
+} from "../types/room"
 
-export type RoomImage = {
-  id: number
-  url: string
-  isMainImage: boolean
-}
-
-export type Extra = {
-  id: number
-  name: string
-  iconName: string
-}
-
-export type Room = {
-  id: number
-  title: string
-  description: string
-  pricePerNight: number
-  capacity: number
-  sizeSqm: number
-  images: RoomImage[]
-  extras: Extra[]
-}
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api"
 
 export async function getRooms(): Promise<Room[]> {
   const response = await axios.get<Room[]>(`${API_BASE_URL}/rooms`)
+
   return response.data
 }
 
 export async function getRoomById(id: string): Promise<Room> {
   const response = await axios.get<Room>(`${API_BASE_URL}/rooms/${id}`)
-  return response.data
-}
 
-export type AvailabilityResult = {
-  available: boolean
+  return response.data
 }
 
 export async function checkRoomAvailability(
@@ -55,29 +38,6 @@ export async function checkRoomAvailability(
   )
 
   return response.data
-}
-
-export type CreateBookingRequest = {
-  roomId: number
-  checkIn: string
-  checkOut: string
-  firstName: string
-  lastName: string
-  email: string
-  breakfast: boolean
-}
-
-export type BookingResponse = {
-  id: number
-  roomId: number
-  checkIn: string
-  checkout: string
-  firstName: string
-  lastName: string
-  email: string
-  breakfast: boolean
-  priceAtBooking?: number
-  createdAt?: string
 }
 
 export async function createBooking(
