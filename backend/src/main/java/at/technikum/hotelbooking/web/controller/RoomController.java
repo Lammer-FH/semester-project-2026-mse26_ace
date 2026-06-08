@@ -1,6 +1,5 @@
 package at.technikum.hotelbooking.web.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,11 +26,9 @@ public class RoomController {
     @Operation(summary = "Get all rooms", description = "Returns a list of all rooms with their details, images and extras")    
     @GetMapping
     public List<RoomResponse> getAllRooms(){
-        List<RoomResponse> result = new ArrayList<>();
-        for(Room room : roomService.getRooms()){
-            result.add(RoomWebMapper.toResponse(room));
-        }
-        return result;
+        return roomService.getRooms().stream()
+            .map(RoomWebMapper::toResponse)
+            .toList();
     }
 
     @Operation(summary = "Get a room by id", description = "Returns the details, images and extras of a specific room by its id")   
