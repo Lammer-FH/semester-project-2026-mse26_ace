@@ -1,12 +1,12 @@
-package at.technikum.hotelbooking.infrastructure.mapper;
+package at.technikum.hotelbooking.web.mapper;
 
 import at.technikum.hotelbooking.domain.model.Booking;
 import at.technikum.hotelbooking.web.dto.BookingResponse;
 import at.technikum.hotelbooking.web.dto.CreateBookingRequest;
 
-public final class BookingEntityMapper {
+public final class BookingWebMapper {
     
-    private BookingEntityMapper(){
+    private BookingWebMapper(){
 
     }
 

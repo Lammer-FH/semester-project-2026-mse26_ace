@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import at.technikum.hotelbooking.domain.model.Availability;
 import at.technikum.hotelbooking.domain.model.BookingPeriod;
@@ -11,6 +12,7 @@ import at.technikum.hotelbooking.domain.model.Room;
 import at.technikum.hotelbooking.domain.port.BookingRepository;
 
 @Service
+@Transactional(readOnly = true)
 public class AvailabilityService {
 
     private final RoomService roomService;
