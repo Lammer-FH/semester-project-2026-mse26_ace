@@ -13,7 +13,11 @@ import at.technikum.hotelbooking.domain.model.Room;
 import at.technikum.hotelbooking.service.RoomService;
 import at.technikum.hotelbooking.web.dto.RoomResponse;
 import at.technikum.hotelbooking.web.mapper.RoomWebMapper;
-@CrossOrigin(origins = "http://localhost:8100")
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+@Tag(name = "Rooms", description = "Get information about rooms")
+@CrossOrigin(origins = "http://localhost:8080")
 @RestController
 @RequestMapping("/api/rooms")
 public class RoomController {
@@ -22,6 +26,7 @@ public class RoomController {
         this.roomService=roomService;
     }
 
+    @Operation(summary = "Get all rooms", description = "Returns a list of all rooms with their details, images and extras")    
     @GetMapping
     public List<RoomResponse> getAllRooms(){
         List<RoomResponse> result = new ArrayList<>();
@@ -31,6 +36,7 @@ public class RoomController {
         return result;
     }
 
+    @Operation(summary = "Get a room by id", description = "Returns the details, images and extras of a specific room by its id")   
     @GetMapping("/{id}")
     public RoomResponse getRoomById(@PathVariable Long id){
         Room room = roomService.getRoomById(id);

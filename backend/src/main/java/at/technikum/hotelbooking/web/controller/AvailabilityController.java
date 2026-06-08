@@ -16,9 +16,12 @@ import at.technikum.hotelbooking.domain.model.BookingPeriod;
 import at.technikum.hotelbooking.service.AvailabilityService;
 import at.technikum.hotelbooking.service.RoomService;
 import at.technikum.hotelbooking.web.dto.AvailabilityResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
+@Tag(name = "Availability", description = "Check room availability for a given period")
 @RestController
-@RequestMapping("/api/rooms")
+@RequestMapping("/api/rooms/availability")
 public class AvailabilityController {
 
     private final AvailabilityService availabilityService;
@@ -32,6 +35,8 @@ public class AvailabilityController {
         this.roomService = roomService;
     }
 
+    @Operation(summary = "Check availability of a room for a given period",
+               description = "Returns whether the room is available and the total price for the period if it is available")
     @GetMapping("/{roomId}/availability")
     public AvailabilityResponse checkAvailability(
             @PathVariable Long roomId,
