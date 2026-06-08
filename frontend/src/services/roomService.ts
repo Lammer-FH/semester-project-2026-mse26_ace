@@ -1,4 +1,4 @@
-import axios from "axios"
+import { apiClient } from "./apiClient"
 
 import type {
   Room,
@@ -7,17 +7,15 @@ import type {
   BookingResponse
 } from "../types/room"
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api"
 
 export async function getRooms(): Promise<Room[]> {
-  const response = await axios.get<Room[]>(`${API_BASE_URL}/rooms`)
+  const response = await apiClient.get<Room[]>("/rooms")
 
   return response.data
 }
 
 export async function getRoomById(id: string): Promise<Room> {
-  const response = await axios.get<Room>(`${API_BASE_URL}/rooms/${id}`)
+  const response = await apiClient.get<Room>(`/rooms/${id}`)
 
   return response.data
 }
@@ -27,8 +25,8 @@ export async function checkRoomAvailability(
   checkIn: string,
   checkOut: string
 ): Promise<AvailabilityResult> {
-  const response = await axios.get<AvailabilityResult>(
-    `${API_BASE_URL}/rooms/${roomId}/availability`,
+  const response = await apiClient.get<AvailabilityResult>(
+    `/rooms/availability/${roomId}/availability`,
     {
       params: {
         checkIn,
@@ -43,10 +41,11 @@ export async function checkRoomAvailability(
 export async function createBooking(
   booking: CreateBookingRequest
 ): Promise<BookingResponse> {
-  const response = await axios.post<BookingResponse>(
-    `${API_BASE_URL}/bookings`,
-    booking
-  )
+  const response = await apiClient.post<BookingResponse>(
+  "/bookings",
+  booking
+)
+
 
   return response.data
 }

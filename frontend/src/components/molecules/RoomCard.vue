@@ -1,10 +1,6 @@
 <template>
   <article class="room-card">
-    <img
-      :src="getMainImage(room)"
-      :alt="room.title"
-      class="room-image"
-    />
+    <img :src="getMainImage(room)" :alt="room.title" class="room-image" />
 
     <div class="room-content">
       <h2>{{ room.title }}</h2>
@@ -14,9 +10,8 @@
       </p>
 
       <p class="room-meta">
-        {{ room.capacity }} guest{{ room.capacity === 1 ? "" : "s" }}
-        · {{ room.sizeSqm }} m²
-        · €{{ room.pricePerNight }} / night
+        {{ room.capacity }} guest{{ room.capacity === 1 ? "" : "s" }} ·
+        {{ room.sizeSqm }} m² · €{{ room.pricePerNight }} / night
       </p>
 
       <div class="extras">
@@ -29,7 +24,7 @@
 
       <ion-button
         expand="block"
-        :router-link="`/rooms/${room.id}`"
+        :router-link="{ name: 'room-details', params: { id: room.id } }"
       >
         View details
       </ion-button>
@@ -38,17 +33,17 @@
 </template>
 
 <script setup lang="ts">
-import { IonButton } from "@ionic/vue"
+import { IonButton } from "@ionic/vue";
 
-import ExtraBadge from "../atoms/ExtraBadge.vue"
-import { useRoomUtils } from "../../composables/useRoomUtils"
-import type { Room } from "../../types/room"
+import ExtraBadge from "../atoms/ExtraBadge.vue";
+import { useRoomUtils } from "../../composables/useRoomUtils";
+import type { Room } from "../../types/room";
 
 defineProps<{
-  room: Room
-}>()
+  room: Room;
+}>();
 
-const { getMainImage } = useRoomUtils()
+const { getMainImage } = useRoomUtils();
 </script>
 
 <style scoped>
