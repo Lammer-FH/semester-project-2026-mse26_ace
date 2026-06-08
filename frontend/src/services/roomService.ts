@@ -26,7 +26,7 @@ export async function checkRoomAvailability(
   checkOut: string
 ): Promise<AvailabilityResult> {
   const response = await apiClient.get<AvailabilityResult>(
-    `/rooms/availability/${roomId}/availability`,
+    `/rooms/${roomId}/availability`,
     {
       params: {
         checkIn,
