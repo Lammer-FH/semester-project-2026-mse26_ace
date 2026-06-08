@@ -1,94 +1,139 @@
 <template>
   <div class="booking-form">
     <div v-if="bookingSuccess" class="confirmation-page">
-      <div class="success-box">
-        <h2>Booking confirmed</h2>
+      <div class="success-hero">
+        <div class="success-icon">✓</div>
 
-        <p>✅ Your reservation has been created successfully.</p>
+        <div>
+          <p class="eyebrow">Booking confirmed</p>
 
-        <p v-if="bookingId"><strong>Booking number:</strong> {{ bookingId }}</p>
-      </div>
+          <h2>Your stay is booked</h2>
 
-      <div class="confirmation-section">
-        <h3>Your room</h3>
-
-        <img
-          :src="roomImage"
-          :alt="roomTitle"
-          class="confirmation-room-image"
-        />
-
-        <h4>{{ roomTitle }}</h4>
-
-        <p>
-          {{ roomDescription }}
-        </p>
-
-        <div class="confirmation-extras">
-          <span v-for="extra in roomExtras" :key="extra.id">
-            {{ getExtraIcon(extra.iconName) }} {{ extra.name }}
-          </span>
+          <p>
+            Thank you for your booking. Your confirmation details are listed
+            below.
+          </p>
         </div>
       </div>
 
-      <div class="confirmation-section">
-        <h3>Booking period</h3>
+      <div class="confirmation-grid">
+        <section class="confirmation-card room-confirmation-card">
+          <img
+            :src="roomImage"
+            :alt="roomTitle"
+            class="confirmation-room-image"
+          />
 
-   
+          <div class="confirmation-card-content">
+            <p class="section-label">Your room</p>
 
-        <p><strong>Check-in:</strong> {{ formatDate(checkIn) }}</p>
+            <h3>{{ roomTitle }}</h3>
 
-        <p><strong>Check-out:</strong> {{ formatDate(checkOut) }}</p>
+            <p>
+              {{ roomDescription }}
+            </p>
 
-        <p><strong>Nights:</strong> {{ numberOfNights }}</p>
-      </div>
+            <div class="confirmation-extras">
+              <ExtraBadge
+                v-for="extra in roomExtras"
+                :key="extra.id"
+                :extra="extra"
+              />
+            </div>
+          </div>
+        </section>
 
-<div class="confirmation-section">
-  <h3>Booking details</h3>
+        <section class="confirmation-card">
+          <p class="section-label">Booking period</p>
 
-  <p v-if="createdAt">
-    <strong>Created at:</strong> {{ formatDateTime(createdAt) }}
-  </p>
+          <h3>
+            {{ numberOfNights }} night{{ numberOfNights === 1 ? "" : "s" }}
+          </h3>
 
-  <p v-if="priceAtBooking !== null">
-    <strong>Price at booking:</strong> €{{ priceAtBooking }}
-  </p>
-</div>
+          <div class="detail-row">
+            <span>Check-in</span>
+            <strong>{{ formatDate(checkIn) }}</strong>
+          </div>
 
-      <div class="confirmation-section">
-        <h3>Personal details</h3>
+          <div class="detail-row">
+            <span>Check-out</span>
+            <strong>{{ formatDate(checkOut) }}</strong>
+          </div>
 
-        <p><strong>Name:</strong> {{ firstName }} {{ lastName }}</p>
+          <div v-if="bookingId" class="detail-row">
+            <span>Booking number</span>
+            <strong>#{{ bookingId }}</strong>
+          </div>
 
-        <p><strong>Email:</strong> {{ email }}</p>
+          <div v-if="createdAt" class="detail-row">
+            <span>Created at</span>
+            <strong>{{ formatDateTime(createdAt) }}</strong>
+          </div>
 
-        <p><strong>Breakfast:</strong> {{ breakfast ? "Yes" : "No" }}</p>
-      </div>
+          <div v-if="priceAtBooking !== null" class="detail-row">
+            <span>Total price</span>
+            <strong>€{{ priceAtBooking }}</strong>
+          </div>
+        </section>
 
-      <div class="confirmation-section">
-        <h3>Directions and contact</h3>
+        <section class="confirmation-card">
+          <p class="section-label">Guest details</p>
 
-        <p>
-          <strong>Address:</strong> ACE Escapes Hotel, Main Street 12, 1010
-          Vienna, Austria
-        </p>
+          <div class="detail-row">
+            <span>Name</span>
+            <strong>{{ firstName }} {{ lastName }}</strong>
+          </div>
 
-        <p><strong>Phone:</strong> +43 1 234 567</p>
+          <div class="detail-row">
+            <span>Email</span>
+            <strong>{{ email }}</strong>
+          </div>
 
-        <p><strong>Email:</strong> contact@ace-escapes.example</p>
+          <div class="detail-row">
+            <span>Breakfast</span>
+            <strong>{{ breakfast ? "Yes" : "No" }}</strong>
+          </div>
+        </section>
 
-        <a
-          href="https://www.google.com/maps/search/?api=1&query=ACE%20Escapes%20Hotel%20Main%20Street%2012%201010%20Vienna%20Austria"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Open directions in Google Maps
-        </a>
+        <section class="confirmation-card">
+          <p class="section-label">Arrival information</p>
+          <h3>Hotel Technikum Boutique Hotel</h3>
+
+          <p>
+            Technikumstraße 10<br />
+            1200 Vienna<br />
+            Austria
+          </p>
+
+          <a
+            class="maps-link"
+            href="https://www.google.com/maps/search/?api=1&query=Hotel%20Technikum%20Boutique%20Hotel%20Technikumstraße%2010%201200%20Vienna%20Austria"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Open directions in Google Maps
+          </a>
+        </section>
+
+        <section class="confirmation-card contact-card">
+          <p class="section-label">Contact</p>
+
+          <p>
+            <strong>Phone:</strong><br />
+            +43 1 234 5678
+          </p>
+
+          <p>
+            <strong>Email:</strong><br />
+            contact@hotel-technikum.example
+          </p>
+        </section>
       </div>
 
       <ion-button
         expand="block"
         class="print-button"
+        color="primary"
         @click="printConfirmation"
       >
         Print confirmation
@@ -157,10 +202,10 @@
       <div class="breakfast-option">
         <input id="breakfast" v-model="breakfast" type="checkbox" />
 
-        <label for="breakfast"> Add breakfast to my stay </label>
+        <label for="breakfast">Add breakfast to my stay</label>
       </div>
 
-      <ion-button expand="block" @click="continueToReview">
+      <ion-button expand="block" color="primary" @click="continueToReview">
         Continue to review
       </ion-button>
     </div>
@@ -215,6 +260,7 @@
 
         <ion-button
           expand="block"
+          color="primary"
           :disabled="bookingLoading"
           @click="confirmBooking"
         >
@@ -228,19 +274,19 @@
 <script setup lang="ts">
 import { reactive, ref } from "vue";
 import { IonButton } from "@ionic/vue";
-import { useBookingStore } from "../stores/bookingStore";
-import { createBooking } from "../services/roomService";
+
+import { createBooking } from "../../services/roomService";
+import { useBookingStore } from "../../stores/bookingStore";
+import ExtraBadge from "../atoms/ExtraBadge.vue";
+
+import type { Extra } from "../../types/room";
 
 const props = defineProps<{
   roomId: number;
   roomTitle: string;
   roomDescription: string;
   roomImage: string;
-  roomExtras: {
-    id: number;
-    name: string;
-    iconName: string;
-  }[];
+  roomExtras: Extra[];
   checkIn: string;
   checkOut: string;
   numberOfNights: number;
@@ -262,7 +308,6 @@ const bookingSuccess = ref(false);
 const bookingId = ref<number | null>(null);
 const createdAt = ref("");
 const priceAtBooking = ref<number | null>(null);
-//const bookingStatus = ref("");
 
 const errors = reactive({
   firstName: "",
@@ -302,18 +347,17 @@ async function confirmBooking() {
       email: email.value.trim(),
       breakfast: breakfast.value,
     });
-console.log("Booking response:", result)
+
     bookingId.value = result.id;
     createdAt.value = result.createdAt || "";
     priceAtBooking.value = result.priceAtBooking ?? null;
-    //bookingStatus.value = result.status || "";
 
     bookingStore.setBookingResult(
       result.id,
       result.createdAt,
       result.priceAtBooking,
-     // result.status,
     );
+
     bookingSuccess.value = true;
   } catch {
     bookingError.value = true;
@@ -381,49 +425,36 @@ function formatDate(date: string) {
 
 function formatDateTime(value: string) {
   if (!value) {
-    return ""
+    return "";
   }
 
-  const dateObject = new Date(value)
+  const dateObject = new Date(value);
 
   return dateObject.toLocaleString("en-US", {
     month: "short",
     day: "numeric",
     year: "numeric",
     hour: "2-digit",
-    minute: "2-digit"
-  })
+    minute: "2-digit",
+  });
 }
 
 function printConfirmation() {
   window.print();
 }
-
-function getExtraIcon(iconName: string) {
-  if (iconName === "wifi") return "📶";
-  if (iconName === "coffee") return "☕";
-  if (iconName === "car") return "🅿️";
-  if (iconName === "tv") return "📺";
-  if (iconName === "wind") return "❄️";
-  if (iconName === "spa") return "🧖";
-
-  return "✨";
-}
-
-
 </script>
 
 <style scoped>
 .booking-form {
   background: var(--ion-card-background, #ffffff);
-  border-radius: 16px;
-  padding: 20px;
+  border-radius: 18px;
+  padding: 22px;
   margin-top: 24px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
 }
 
 .form-intro {
-  color: #555;
+  color: #555555;
   margin-bottom: 20px;
 }
 
@@ -464,11 +495,12 @@ function getExtraIcon(iconName: string) {
 }
 
 .review-box {
-  background-color: #f3f3f3;
+  background-color: #f6fbf9;
   color: #222222;
   padding: 14px;
   border-radius: 12px;
   margin-bottom: 16px;
+  border-left: 5px solid var(--ion-color-primary, #207868);
 }
 
 .review-box h3 {
@@ -485,13 +517,6 @@ function getExtraIcon(iconName: string) {
   gap: 10px;
 }
 
-.success-box {
-  background-color: #e8f5e9;
-  color: #1b5e20;
-  padding: 18px;
-  border-radius: 14px;
-}
-
 .booking-error-box {
   background-color: #ffebee;
   color: #b71c1c;
@@ -505,50 +530,163 @@ function getExtraIcon(iconName: string) {
 }
 
 .confirmation-page {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.success-hero {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  background: linear-gradient(
+    135deg,
+    rgba(35, 83, 71, 0.95),
+    rgba(32, 120, 104, 0.9)
+  );
+  color: #ffffff;
+  border-radius: 22px;
+  padding: 24px;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.14);
+}
+
+.success-icon {
+  min-width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background-color: #ffffff;
+  color: var(--ion-color-primary, #207868);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  font-weight: 800;
+}
+
+.success-hero .eyebrow,
+.success-hero h2,
+.success-hero p {
+  color: #ffffff;
+}
+
+.success-hero h2 {
+  font-size: 30px;
+  margin: 0 0 8px;
+}
+
+.success-hero p {
+  margin: 0;
+}
+
+.eyebrow,
+.section-label {
+  color: var(--ion-color-primary, #207868);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin: 0 0 10px;
+}
+
+.confirmation-grid {
   display: grid;
+  grid-template-columns: 1fr;
   gap: 18px;
 }
 
-.confirmation-section {
-  background-color: #f7f7f7;
+.confirmation-card {
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 20px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.07);
+  border-top: 5px solid var(--ion-color-primary, #207868);
+}
+
+.confirmation-card h3 {
+  font-size: 22px;
+  margin: 0 0 12px;
   color: #222222;
-  padding: 16px;
-  border-radius: 14px;
 }
 
-.confirmation-section h3 {
-  margin-top: 0;
+.confirmation-card p {
+  color: #555555;
+  line-height: 1.6;
+  margin: 0 0 12px;
 }
 
-.confirmation-section p {
-  margin: 8px 0;
+.room-confirmation-card {
+  padding: 0;
+  overflow: hidden;
 }
 
 .confirmation-room-image {
   width: 100%;
-  max-height: 260px;
+  height: 220px;
   object-fit: cover;
-  border-radius: 12px;
-  margin-bottom: 12px;
+  display: block;
+}
+
+.confirmation-card-content {
+  padding: 20px;
 }
 
 .confirmation-extras {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-top: 12px;
+  margin-top: 14px;
 }
 
-.confirmation-extras span {
-  background-color: #eeeeee;
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  border-bottom: 1px solid #eeeeee;
+  padding: 10px 0;
+}
+
+.detail-row:last-child {
+  border-bottom: none;
+}
+
+.detail-row span {
+  color: #666666;
+}
+
+.detail-row strong {
   color: #222222;
-  padding: 6px 10px;
-  border-radius: 12px;
-  font-size: 14px;
+  text-align: right;
+}
+
+.maps-link {
+  display: inline-block;
+  margin-top: 8px;
+  color: var(--ion-color-primary, #207868);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.maps-link:hover {
+  text-decoration: underline;
+}
+
+.contact-card {
+  background: #fffaf0;
+  border-top-color: var(--ion-color-secondary, #f4b942);
 }
 
 .print-button {
   margin-top: 4px;
+}
+
+@media (min-width: 768px) {
+  .confirmation-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .room-confirmation-card {
+    grid-column: span 2;
+  }
 }
 
 @media print {
@@ -569,44 +707,53 @@ function getExtraIcon(iconName: string) {
     gap: 10px;
   }
 
-  .success-box {
-    padding: 10px;
+  .success-hero {
+    padding: 14px;
+    box-shadow: none;
   }
 
-  .confirmation-section {
-    padding: 10px;
-    border-radius: 8px;
+  .success-icon {
+    min-width: 38px;
+    height: 38px;
+    font-size: 22px;
+  }
+
+  .success-hero h2 {
+    font-size: 22px;
+  }
+
+  .confirmation-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .confirmation-card {
+    padding: 12px;
+    box-shadow: none;
     break-inside: avoid;
     page-break-inside: avoid;
   }
 
-  .confirmation-section h3 {
-    margin: 0 0 6px;
-    font-size: 16px;
+  .room-confirmation-card {
+    grid-column: span 2;
   }
 
-  .confirmation-section h4 {
-    margin: 6px 0;
-    font-size: 14px;
-  }
-
-  .confirmation-section p {
-    margin: 4px 0;
+  .confirmation-card-content {
+    padding: 12px;
   }
 
   .confirmation-room-image {
-    max-height: 120px;
-    margin-bottom: 8px;
+    height: 120px;
   }
 
-  .confirmation-extras {
-    gap: 6px;
-    margin-top: 6px;
+  .confirmation-card h3 {
+    font-size: 16px;
+    margin-bottom: 6px;
   }
 
-  .confirmation-extras span {
-    padding: 3px 6px;
-    font-size: 11px;
+  .confirmation-card p,
+  .detail-row {
+    font-size: 12px;
   }
 
   body {

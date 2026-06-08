@@ -11,7 +11,7 @@
         />
 
         <div class="hero-text">
-          <h1>Welcome to ACE Escapes</h1>
+          <h1>Welcome to Hotel Boutique</h1>
 
           <p>
             Enjoy a relaxing stay at our boutique hotel. Discover comfortable

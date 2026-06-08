@@ -33,17 +33,19 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue"
+import { computed, onMounted } from "vue"
 import { useRoute } from "vue-router"
-import { IonPage, IonContent, IonButton } from "@ionic/vue"
-
-import AppHeader from "../components/AppHeader.vue"
-import BookingForm from "../components/BookingForm.vue"
 
 import {
-  getRoomById,
-  type Room
-} from "../services/roomService"
+  IonPage,
+  IonContent,
+  IonButton
+} from "@ionic/vue"
+
+import AppHeader from "../components/AppHeader.vue"
+import BookingForm from "../components/organisms/BookingForm.vue"
+import { useRoomUtils } from "../composables/useRoomUtils"
+import { useRoomStore } from "../stores/roomStore"
 
 const route = useRoute()
 
@@ -51,9 +53,12 @@ const roomId = route.params.id as string
 const checkIn = route.query.checkIn as string
 const checkOut = route.query.checkOut as string
 
-const room = ref<Room | null>(null)
-const loading = ref(false)
-const error = ref(false)
+const roomStore = useRoomStore()
+const { getMainImage } = useRoomUtils()
+
+const room = computed(() => roomStore.selectedRoom)
+const loading = computed(() => roomStore.loading)
+const error = computed(() => roomStore.error)
 
 const numberOfNights = computed(() => {
   if (!checkIn || !checkOut) {
@@ -66,30 +71,8 @@ const numberOfNights = computed(() => {
   return (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)
 })
 
-async function loadRoom() {
-  loading.value = true
-  error.value = false
-
-  try {
-    room.value = await getRoomById(roomId)
-  } catch {
-    error.value = true
-  } finally {
-    loading.value = false
-  }
-}
-
-function getMainImage(room: Room) {
-  const mainImage = room.images?.find((image) => image.isMainImage)
-
-  return (
-    mainImage?.url ||
-    "https://images.unsplash.com/photo-1566665797739-1674de7a421a"
-  )
-}
-
 onMounted(() => {
-  loadRoom()
+  roomStore.loadRoomById(roomId)
 })
 </script>
 
