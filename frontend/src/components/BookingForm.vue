@@ -34,12 +34,26 @@
       <div class="confirmation-section">
         <h3>Booking period</h3>
 
+   
+
         <p><strong>Check-in:</strong> {{ formatDate(checkIn) }}</p>
 
         <p><strong>Check-out:</strong> {{ formatDate(checkOut) }}</p>
 
         <p><strong>Nights:</strong> {{ numberOfNights }}</p>
       </div>
+
+<div class="confirmation-section">
+  <h3>Booking details</h3>
+
+  <p v-if="createdAt">
+    <strong>Created at:</strong> {{ formatDateTime(createdAt) }}
+  </p>
+
+  <p v-if="priceAtBooking !== null">
+    <strong>Price at booking:</strong> €{{ priceAtBooking }}
+  </p>
+</div>
 
       <div class="confirmation-section">
         <h3>Personal details</h3>
@@ -246,6 +260,9 @@ const bookingLoading = ref(false);
 const bookingError = ref(false);
 const bookingSuccess = ref(false);
 const bookingId = ref<number | null>(null);
+const createdAt = ref("");
+const priceAtBooking = ref<number | null>(null);
+//const bookingStatus = ref("");
 
 const errors = reactive({
   firstName: "",
@@ -285,13 +302,17 @@ async function confirmBooking() {
       email: email.value.trim(),
       breakfast: breakfast.value,
     });
-
+console.log("Booking response:", result)
     bookingId.value = result.id;
+    createdAt.value = result.createdAt || "";
+    priceAtBooking.value = result.priceAtBooking ?? null;
+    //bookingStatus.value = result.status || "";
+
     bookingStore.setBookingResult(
       result.id,
       result.createdAt,
       result.priceAtBooking,
-      result.status,
+     // result.status,
     );
     bookingSuccess.value = true;
   } catch {
@@ -358,6 +379,22 @@ function formatDate(date: string) {
   });
 }
 
+function formatDateTime(value: string) {
+  if (!value) {
+    return ""
+  }
+
+  const dateObject = new Date(value)
+
+  return dateObject.toLocaleString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit"
+  })
+}
+
 function printConfirmation() {
   window.print();
 }
@@ -372,6 +409,8 @@ function getExtraIcon(iconName: string) {
 
   return "✨";
 }
+
+
 </script>
 
 <style scoped>
