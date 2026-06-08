@@ -1,7 +1,9 @@
 export type RoomImage = {
   id: number
-  url: string
-  isMainImage: boolean
+  url?: string
+  filePath?: string
+  isMainImage?: boolean
+  isPrimary?: boolean
   sortOrder: number
 }
 

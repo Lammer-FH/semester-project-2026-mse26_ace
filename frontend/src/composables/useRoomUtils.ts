@@ -18,12 +18,21 @@ type ExtraLike = {
 
 export function useRoomUtils() {
   function getMainImage(room: Room) {
-    const mainImage = room.images?.find((image) => image.isMainImage)
+    const mainImage = room.images?.find((image) => {
+      return image.isMainImage || image.isPrimary
+    })
 
-    return (
-      mainImage?.url ||
-      "https://images.unsplash.com/photo-1566665797739-1674de7a421a"
-    )
+    const imagePath = mainImage?.url || mainImage?.filePath
+
+    if (!imagePath) {
+      return "https://images.unsplash.com/photo-1566665797739-1674de7a421a"
+    }
+
+    if (imagePath.startsWith("http")) {
+      return imagePath
+    }
+
+    return `http://localhost:8080${imagePath}`
   }
 
   function getExtraIcon(extra: ExtraLike) {
