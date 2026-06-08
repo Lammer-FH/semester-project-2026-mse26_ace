@@ -1,6 +1,7 @@
 # ER Diagram
 
-Visual reference:.
+Visual reference:
+![ER Diagram](Docs/ACEEscapes_ER_v2.0.png)
 
 ## Tables
 
