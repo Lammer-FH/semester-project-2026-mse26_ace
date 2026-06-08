@@ -33,6 +33,18 @@
 - **Accepted / modified / rejected:** We gave it our controllers and DTOs; it updated the spec (base path, room schema, removed pagination, etc.). We accepted the result and marked the unimplemented endpoints as planned.
 - **Why:** The original spec no longer matched the code (e.g. extras structure, image fields, /api path).
  
+ ### Backend implementation guidance (U2 to U5)
+- **Tool:** Claude Opus 4.7
+- **Task:** Step-by-step guidance for the backend structure (clean architecture layers, entity mappers, ports and adapters, controllers, DTOs, exception handler).
+- **Accepted / modified / rejected:** We wrote the code ourselves following the suggested structure. Names, comments and small details were adjusted to fit our package layout and style. Some suggestions were rejected when they conflicted with what teammates had already built (for example we kept our existing AvailabilityService instead of refactoring it).
+
+
+### Audit fields on bookings (created_at, price_at_booking)
+- **Tool:** Claude Opus 4.7
+- **Task:** Add created_at (database default timestamp) and price_at_booking (calculated server side) to the bookings table and propagate them through entity, domain, service, DTO and mapper.
+- **Accepted / modified / rejected:** Accepted the use of @CreationTimestamp on the JPA entity instead of a manual refresh, and the choice to calculate the price in the service rather than accept it from the client. We typed out the changes ourselves and verified them with curl.
+- **Why:** We needed support with adding missing fields without removing/adding much logic.
+
 ## AI Workflow
 For each task we worked roughly like this:
 1. **Define the task** - we wrote down what we needed and the constraints.
