@@ -1,7 +1,60 @@
 # ER Diagram
 
-Visual reference:
+Visual reference (Draw.io):
 ![ER Diagram](Docs/ACEEscapes_ER_v2.0.png)
+
+Visual reference (Mermaid):
+```mermaid
+erDiagram
+    rooms {
+        bigint id PK
+        varchar title
+        text description
+        decimal price_per_night
+        int capacity
+        varchar bed_configuration
+        int size_sqm
+    }
+ 
+    extras {
+        bigint id PK
+        varchar name
+        varchar icon_name
+        text description
+    }
+ 
+    room_extras {
+        bigint room_id PK,FK
+        bigint extra_id PK,FK
+    }
+ 
+    room_images {
+        bigint id PK
+        bigint room_id FK
+        varchar file_path
+        int sort_order
+        boolean is_primary
+    }
+ 
+    bookings {
+        bigint id PK
+        bigint room_id FK
+        date check_in
+        date check_out
+        varchar first_name
+        varchar last_name
+        varchar email
+        boolean breakfast
+        decimal price_at_booking
+        varchar status
+        timestamp created_at
+    }
+ 
+    rooms ||--o{ room_images : has
+    rooms ||--o{ bookings : "is booked in"
+    rooms ||--o{ room_extras : offers
+    extras ||--o{ room_extras : "available in"
+```
 
 ## Tables
 
