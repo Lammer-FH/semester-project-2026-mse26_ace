@@ -76,9 +76,8 @@ export type BookingResponse = {
   lastName: string
   email: string
   breakfast: boolean
+  priceAtBooking?: number
   createdAt?: string
-priceAtBooking?: number
-status?: string
 }
 
 export async function createBooking(
