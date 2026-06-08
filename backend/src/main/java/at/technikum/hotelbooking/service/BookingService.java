@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.temporal.ChronoUnit;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import at.technikum.hotelbooking.domain.model.Booking;
 import at.technikum.hotelbooking.domain.model.Room;
@@ -11,6 +12,7 @@ import at.technikum.hotelbooking.domain.port.BookingRepository;
 import at.technikum.hotelbooking.domain.port.RoomRepository;
 
 @Service
+@Transactional
 public class BookingService {
     
     private final BookingRepository bookingRepository;

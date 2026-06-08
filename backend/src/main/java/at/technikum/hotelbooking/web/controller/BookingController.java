@@ -10,10 +10,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import at.technikum.hotelbooking.domain.model.Booking;
-import at.technikum.hotelbooking.infrastructure.mapper.BookingEntityMapper;
 import at.technikum.hotelbooking.service.BookingService;
 import at.technikum.hotelbooking.web.dto.BookingResponse;
 import at.technikum.hotelbooking.web.dto.CreateBookingRequest;
+import at.technikum.hotelbooking.web.mapper.BookingWebMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -33,9 +33,9 @@ public class BookingController {
            description = "Validates dates, checks availability, calculates the total price and saves the booking")
     @PostMapping
     public ResponseEntity<BookingResponse> createBooking(@Valid @RequestBody CreateBookingRequest request) {
-       Booking domain = BookingEntityMapper.toDomain(request);
+       Booking domain = BookingWebMapper.toDomain(request);
        Booking saved = bookingService.createBooking(domain);
-       BookingResponse response = BookingEntityMapper.toResponse(saved);
+       BookingResponse response = BookingWebMapper.toResponse(saved);
        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -43,7 +43,7 @@ public class BookingController {
     @GetMapping("/{id}")
     public BookingResponse getBookingById(@PathVariable Long id) {
         Booking booking = bookingService.getBookingById(id);
-        return BookingEntityMapper.toResponse(booking);
+        return BookingWebMapper.toResponse(booking);
     }
     
     

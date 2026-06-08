@@ -3,11 +3,13 @@ package at.technikum.hotelbooking.service;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import at.technikum.hotelbooking.domain.model.Room;
 import at.technikum.hotelbooking.domain.port.RoomRepository;
 
 @Service
+@Transactional(readOnly =true)
 public class RoomService {
 
     private final RoomRepository roomRepository;
@@ -22,7 +24,7 @@ public class RoomService {
 
     public Room getRoomById(Long id) {
         return roomRepository.findById(id)
-                .orElseThrow(() -> new RoomNotFoundException("room not found: " + id));
+                .orElseThrow(() -> new RoomNotFoundException("Room not found: " + id));
     }
 
 }
