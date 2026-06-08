@@ -9,17 +9,10 @@ See [team.md](team.md).
 ## Docs
 
 - [API Specification](Docs/ACE_Escapes_Hotel_Booking_API_v2.0.pdf) – OpenAPI 3.0, built with Swagger
-- [ER Diagram](Docs/ACEEscapes_diagram.png) – database model (Draw.io)
+- [ER Diagram](Docs/ER_Diagram_ACEEscapes.md) – database model (Draw.io)
 - [Web Prototype](Docs/ACE_Webprototype.pdf)
 - [Mobile Prototype](Docs/ACEEscapes_MobileProtoype_v2.0.png)
 
-![ER Diagram](Docs/ACEEscapes_diagram.png)
-
-Quick note on the data model: the main tables are `rooms`, `bookings`, `extras` and `room_images`.
-After the feedback we moved the `extras` (e.g. Wi-Fi, breakfast) out of the old comma-separated field
-into their own table and linked them to the rooms through the `room_extras` junction table. That way
-we avoid the error-prone text search and can keep the features clean. Prices (`price_per_night`) are
-stored as `DECIMAL` instead of `FLOAT` so there are no rounding issues with the amounts.
 
 ## Tech Stack
 
