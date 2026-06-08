@@ -25,13 +25,15 @@ export async function checkRoomAvailability(
   checkIn: string,
   checkOut: string
 ): Promise<AvailabilityResult> {
-  const response = await apiClient.get<AvailabilityResult>("/rooms/availability", {
-  params: {
-    roomId,
-    checkIn,
-    checkOut
-  }
-})
+  const response = await apiClient.get<AvailabilityResult>(
+    `/rooms/availability/${roomId}/availability`,
+    {
+      params: {
+        checkIn,
+        checkOut
+      }
+    }
+  )
 
   return response.data
 }

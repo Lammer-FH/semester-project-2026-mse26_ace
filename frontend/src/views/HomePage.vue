@@ -1,6 +1,6 @@
 <template>
   <ion-page>
-       <AppHeader />
+    <AppHeader />
 
     <ion-content>
       <section class="hero">
@@ -18,7 +18,9 @@
             rooms, friendly service and everything you need for your next trip.
           </p>
 
-          <ion-button router-link="/rooms"> Browse rooms </ion-button>
+          <ion-button :router-link="{ name: 'rooms' }">
+            Browse rooms
+          </ion-button>
         </div>
       </section>
     </ion-content>
@@ -26,7 +28,7 @@
 </template>
 
 <script setup lang="ts">
-import AppHeader from '../components/AppHeader.vue'
+import AppHeader from "../components/AppHeader.vue";
 import {
   IonPage,
   IonHeader,

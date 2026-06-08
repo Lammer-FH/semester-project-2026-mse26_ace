@@ -25,9 +25,7 @@
       {{ numberOfNights }} night{{ numberOfNights === 1 ? "" : "s" }} ·
       {{ formatDate(checkInDate) }} → {{ formatDate(checkOutDate) }}
 
-      <button class="reset-button" @click="resetDates">
-        Reset
-      </button>
+      <button class="reset-button" @click="resetDates">Reset</button>
     </div>
 
     <ion-button
@@ -42,9 +40,7 @@
       Please select a check-in and check-out date before checking availability.
     </p>
 
-    <p v-if="availabilityLoading" class="hint">
-      Checking availability...
-    </p>
+    <p v-if="availabilityLoading" class="hint">Checking availability...</p>
 
     <div
       v-if="availabilityChecked && isAvailable === true"
@@ -75,155 +71,163 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue"
-import { IonButton, IonDatetime } from "@ionic/vue"
+import { computed, ref } from "vue";
+import { IonButton, IonDatetime } from "@ionic/vue";
 
-import { checkRoomAvailability } from "../../services/roomService"
-import { useBookingStore } from "../../stores/bookingStore"
+import { checkRoomAvailability } from "../../services/roomService";
+import { useBookingStore } from "../../stores/bookingStore";
 
 const props = defineProps<{
-  roomId: number
-}>()
+  roomId: number;
+}>();
 
-const bookingStore = useBookingStore()
+const bookingStore = useBookingStore();
 
-const checkInDate = ref("")
-const checkOutDate = ref("")
+const checkInDate = ref("");
+const checkOutDate = ref("");
 
-const availabilityLoading = ref(false)
-const availabilityError = ref(false)
-const availabilityChecked = ref(false)
-const isAvailable = ref<boolean | null>(null)
-const dateMissingError = ref(false)
+const availabilityLoading = ref(false);
+const availabilityError = ref(false);
+const availabilityChecked = ref(false);
+const isAvailable = ref<boolean | null>(null);
+const dateMissingError = ref(false);
 
 const calendarValue = computed(() => {
-  return checkOutDate.value || checkInDate.value || ""
-})
+  return checkOutDate.value || checkInDate.value || "";
+});
 
 const calendarInstruction = computed(() => {
   if (!checkInDate.value) {
-    return "Select your check-in date."
+    return "Select your check-in date.";
   }
 
   if (!checkOutDate.value) {
-    return "Now select your check-out date."
+    return "Now select your check-out date.";
   }
 
-  return "Your stay period is selected. Click another date to start again."
-})
+  return "Your stay period is selected. Click another date to start again.";
+});
 
 const dateError = computed(() => {
   if (!checkInDate.value || !checkOutDate.value) {
-    return false
+    return false;
   }
 
-  return toApiDate(checkOutDate.value) < toApiDate(checkInDate.value)
-})
+  return toApiDate(checkOutDate.value) < toApiDate(checkInDate.value);
+});
 
 const numberOfNights = computed(() => {
   if (!checkInDate.value || !checkOutDate.value || dateError.value) {
-    return 0
+    return 0;
   }
 
-  const start = new Date(toApiDate(checkInDate.value) + "T00:00:00")
-  const end = new Date(toApiDate(checkOutDate.value) + "T00:00:00")
+  const start = new Date(toApiDate(checkInDate.value) + "T00:00:00");
+  const end = new Date(toApiDate(checkOutDate.value) + "T00:00:00");
 
-  const difference = end.getTime() - start.getTime()
+  const difference = end.getTime() - start.getTime();
 
-  return difference / (1000 * 60 * 60 * 24)
-})
+  return difference / (1000 * 60 * 60 * 24);
+});
 
 const bookingLink = computed(() => {
-  const checkIn = toApiDate(checkInDate.value)
-  const checkOut = toApiDate(checkOutDate.value)
+  const checkIn = toApiDate(checkInDate.value);
+  const checkOut = toApiDate(checkOutDate.value);
 
-  bookingStore.setBookingPeriod(props.roomId, checkIn, checkOut)
-
-  return `/booking/${props.roomId}?checkIn=${checkIn}&checkOut=${checkOut}`
-})
+  bookingStore.setBookingPeriod(props.roomId, checkIn, checkOut);
+  return {
+    name: "booking",
+    params: {
+      id: props.roomId,
+    },
+    query: {
+      checkIn,
+      checkOut,
+    },
+  };
+});
 
 function selectCalendarDate(value: string | string[] | null | undefined) {
   if (typeof value !== "string") {
-    return
+    return;
   }
 
   if (!checkInDate.value || checkOutDate.value) {
-    checkInDate.value = value
-    checkOutDate.value = ""
+    checkInDate.value = value;
+    checkOutDate.value = "";
   } else {
-    checkOutDate.value = value
+    checkOutDate.value = value;
   }
 
-  availabilityError.value = false
-  availabilityChecked.value = false
-  dateMissingError.value = false
-  isAvailable.value = null
+  availabilityError.value = false;
+  availabilityChecked.value = false;
+  dateMissingError.value = false;
+  isAvailable.value = null;
 }
 
 function resetDates() {
-  checkInDate.value = ""
-  checkOutDate.value = ""
+  checkInDate.value = "";
+  checkOutDate.value = "";
 
-  availabilityError.value = false
-  availabilityChecked.value = false
-  dateMissingError.value = false
-  isAvailable.value = null
+  availabilityError.value = false;
+  availabilityChecked.value = false;
+  dateMissingError.value = false;
+  isAvailable.value = null;
 }
 
 function formatDate(date: string) {
   if (!date) {
-    return ""
+    return "";
   }
 
-  const dateOnly = toApiDate(date)
-  const dateObject = new Date(dateOnly + "T00:00:00")
+  const dateOnly = toApiDate(date);
+  const dateObject = new Date(dateOnly + "T00:00:00");
 
   return dateObject.toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
-    year: "numeric"
-  })
+    year: "numeric",
+  });
 }
 
 async function handleCheckAvailability() {
-  dateMissingError.value = false
-  availabilityError.value = false
-  availabilityChecked.value = false
-  isAvailable.value = null
+  dateMissingError.value = false;
+  availabilityError.value = false;
+  availabilityChecked.value = false;
+  isAvailable.value = null;
 
   if (!checkInDate.value || !checkOutDate.value) {
-    dateMissingError.value = true
-    return
+    dateMissingError.value = true;
+    return;
   }
 
   if (dateError.value) {
-    return
+    return;
   }
 
-  availabilityLoading.value = true
+  availabilityLoading.value = true;
 
   try {
     const result = await checkRoomAvailability(
       String(props.roomId),
       toApiDate(checkInDate.value),
-      toApiDate(checkOutDate.value)
-    )
+      toApiDate(checkOutDate.value),
+    );
 
-    isAvailable.value = result.available
-    availabilityChecked.value = true
+    isAvailable.value = result.available;
+    availabilityChecked.value = true;
   } catch {
-    availabilityError.value = true
+    availabilityError.value = true;
   } finally {
-    availabilityLoading.value = false
+    availabilityLoading.value = false;
   }
 }
 
 function toApiDate(date: string) {
   if (!date) {
-    return ""
+    return "";
   }
 
-  return date.split("T")[0]
+  return date.split("T")[0];
 }
 </script>
 

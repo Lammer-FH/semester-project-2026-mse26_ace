@@ -4,7 +4,11 @@
 
     <ion-content>
       <section class="detail-page">
-        <ion-button class="back-button" fill="clear" router-link="/rooms">
+        <ion-button
+          class="back-button"
+          fill="clear"
+          :router-link="{ name: 'rooms' }"
+        >
           ← Back to rooms
         </ion-button>
 
@@ -19,9 +23,7 @@
           </p>
         </div>
 
-        <p v-if="loading" class="status-text">
-          Loading room...
-        </p>
+        <p v-if="loading" class="status-text">Loading room...</p>
 
         <p v-if="error" class="error">
           Room could not be loaded. Please try again later.
@@ -56,9 +58,7 @@
                 <div class="fact-box">
                   <span>Capacity</span>
                   <strong>{{ room.capacity }}</strong>
-                  <small>
-                    guest{{ room.capacity === 1 ? "" : "s" }}
-                  </small>
+                  <small> guest{{ room.capacity === 1 ? "" : "s" }} </small>
                 </div>
 
                 <div class="fact-box">
@@ -92,44 +92,39 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from "vue"
-import { useRoute } from "vue-router"
+import { computed, onMounted } from "vue";
+import { useRoute } from "vue-router";
 
-import {
-  IonPage,
-  IonContent,
-  IonButton
-} from "@ionic/vue"
+import { IonPage, IonContent, IonButton } from "@ionic/vue";
 
-import AppHeader from "../components/AppHeader.vue"
-import ExtraBadge from "../components/atoms/ExtraBadge.vue"
-import BookingWidget from "../components/molecules/BookingWidget.vue"
+import AppHeader from "../components/AppHeader.vue";
+import ExtraBadge from "../components/atoms/ExtraBadge.vue";
+import BookingWidget from "../components/molecules/BookingWidget.vue";
 
-import { useRoomUtils } from "../composables/useRoomUtils"
-import { useRoomStore } from "../stores/roomStore"
+import { useRoomUtils } from "../composables/useRoomUtils";
+import { useRoomStore } from "../stores/roomStore";
 
-const route = useRoute()
-const roomId = route.params.id as string
+const route = useRoute();
+const roomId = route.params.id as string;
 
-const roomStore = useRoomStore()
+const roomStore = useRoomStore();
 
-const room = computed(() => roomStore.selectedRoom)
-const loading = computed(() => roomStore.loading)
-const error = computed(() => roomStore.error)
+const room = computed(() => roomStore.selectedRoom);
+const loading = computed(() => roomStore.loading);
+const error = computed(() => roomStore.error);
 
-const { getMainImage } = useRoomUtils()
+const { getMainImage } = useRoomUtils();
 
 onMounted(() => {
-  roomStore.loadRoomById(roomId)
-})
+  roomStore.loadRoomById(roomId);
+});
 </script>
 
 <style scoped>
 .detail-page {
   min-height: 100%;
   padding: 18px 22px 32px;
-  background:
-    linear-gradient(180deg, #f4f7f5 0%, #ffffff 45%);
+  background: linear-gradient(180deg, #f4f7f5 0%, #ffffff 45%);
 }
 
 .detail-page > * {
