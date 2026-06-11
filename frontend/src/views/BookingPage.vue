@@ -46,6 +46,7 @@ import AppHeader from "../components/AppHeader.vue"
 import BookingForm from "../components/organisms/BookingForm.vue"
 import { useRoomUtils } from "../composables/useRoomUtils"
 import { useRoomStore } from "../stores/roomStore"
+import { useBookingStore } from "../stores/bookingStore"
 
 const route = useRoute()
 
@@ -54,6 +55,8 @@ const checkIn = route.query.checkIn as string
 const checkOut = route.query.checkOut as string
 
 const roomStore = useRoomStore()
+const bookingStore = useBookingStore()
+
 const { getMainImage } = useRoomUtils()
 
 const room = computed(() => roomStore.selectedRoom)
@@ -72,6 +75,7 @@ const numberOfNights = computed(() => {
 })
 
 onMounted(() => {
+  bookingStore.clearBooking()
   roomStore.loadRoomById(roomId)
 })
 </script>
