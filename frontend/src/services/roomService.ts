@@ -1,42 +1,23 @@
-import axios from 'axios'
+import { apiClient } from "./apiClient"
 
-const API_BASE_URL = 'http://localhost:8080/api'
+import type {
+  Room,
+  AvailabilityResult,
+  CreateBookingRequest,
+  BookingResponse
+} from "../types/room"
 
-export type RoomImage = {
-  id: number
-  url: string
-  isMainImage: boolean
-}
-
-export type Extra = {
-  id: number
-  name: string
-  iconName: string
-}
-
-export type Room = {
-  id: number
-  title: string
-  description: string
-  pricePerNight: number
-  capacity: number
-  sizeSqm: number
-  images: RoomImage[]
-  extras: Extra[]
-}
 
 export async function getRooms(): Promise<Room[]> {
-  const response = await axios.get<Room[]>(`${API_BASE_URL}/rooms`)
+  const response = await apiClient.get<Room[]>("/rooms")
+
   return response.data
 }
 
 export async function getRoomById(id: string): Promise<Room> {
-  const response = await axios.get<Room>(`${API_BASE_URL}/rooms/${id}`)
-  return response.data
-}
+  const response = await apiClient.get<Room>(`/rooms/${id}`)
 
-export type AvailabilityResult = {
-  available: boolean
+  return response.data
 }
 
 export async function checkRoomAvailability(
@@ -44,8 +25,8 @@ export async function checkRoomAvailability(
   checkIn: string,
   checkOut: string
 ): Promise<AvailabilityResult> {
-  const response = await axios.get<AvailabilityResult>(
-    `${API_BASE_URL}/rooms/${roomId}/availability`,
+  const response = await apiClient.get<AvailabilityResult>(
+    `/rooms/${roomId}/availability`,
     {
       params: {
         checkIn,
@@ -53,6 +34,18 @@ export async function checkRoomAvailability(
       }
     }
   )
+
+  return response.data
+}
+
+export async function createBooking(
+  booking: CreateBookingRequest
+): Promise<BookingResponse> {
+  const response = await apiClient.post<BookingResponse>(
+  "/bookings",
+  booking
+)
+
 
   return response.data
 }

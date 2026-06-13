@@ -33,3 +33,4 @@ npm-debug.log*
 frontend/node_modules/
 frontend/dist/
 frontend/www/
+frontend/.env

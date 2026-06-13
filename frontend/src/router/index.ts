@@ -6,40 +6,41 @@ import AboutPage from '../views/AboutPage.vue'
 import ImprintPage from '../views/ImprintPage.vue'
 import RoomsPage from '../views/RoomsPage.vue'
 import RoomDetailPage from '../views/RoomDetailPage.vue'
+import BookingPage from "../views/BookingPage.vue"
 
 
-const routes: Array<RouteRecordRaw> = [
+const routes = [
   {
-    path: '/',
-    redirect: '/home'
+    path: "/",
+    name: "home",
+    component: () => import("../views/HomePage.vue")
   },
   {
-    path: '/home',
-    name: 'Home',
-    component: HomePage
+    path: "/rooms",
+    name: "rooms",
+    component: () => import("../views/RoomsPage.vue")
   },
   {
-    path: '/about',
-    name: 'About',
-    component: AboutPage
-  },
-    {
-    path: '/imprint',
-    name: 'Imprint',
-    component: ImprintPage
+    path: "/rooms/:id",
+    name: "room-details",
+    component: () => import("../views/RoomDetailPage.vue")
   },
   {
-  path: '/rooms',
-  name: 'Rooms',
-  component: RoomsPage
-},
-{
-  path: '/rooms/:id',
-  name: 'RoomDetail',
-  component: RoomDetailPage
-},
+    path: "/booking/:id",
+    name: "booking",
+    component: () => import("../views/BookingPage.vue")
+  },
+  {
+    path: "/about",
+    name: "about",
+    component: () => import("../views/AboutPage.vue")
+  },
+  {
+    path: "/imprint",
+    name: "imprint",
+    component: () => import("../views/ImprintPage.vue")
+  }
 ]
-
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes

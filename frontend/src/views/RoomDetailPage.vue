@@ -4,118 +4,87 @@
 
     <ion-content>
       <section class="detail-page">
-        <ion-button fill="clear" router-link="/rooms">
+        <ion-button
+          class="back-button"
+          fill="clear"
+          :router-link="{ name: 'rooms' }"
+        >
           ← Back to rooms
         </ion-button>
 
-        <h1>Room Details</h1>
+        <div class="detail-hero">
+          <p class="eyebrow">Room Details</p>
 
-        <p v-if="loading">Loading room...</p>
+          <h1>Plan your perfect stay</h1>
+
+          <p>
+            Choose your travel period, check availability and continue with your
+            booking in just a few steps.
+          </p>
+        </div>
+
+        <p v-if="loading" class="status-text">Loading room...</p>
 
         <p v-if="error" class="error">
           Room could not be loaded. Please try again later.
         </p>
 
         <div v-if="room && !loading && !error" class="detail-layout">
-          <div class="room-info">
-            <img
-              :src="getMainImage(room)"
-              :alt="room.title"
-              class="room-image"
-            />
-
-            <h2>{{ room.title }}</h2>
-
-            <p>
-              {{ room.description }}
-            </p>
-
-            <p class="room-meta">
-              <strong>Price:</strong> €{{ room.pricePerNight }} per night
-            </p>
-
-            <p class="room-meta">
-              <strong>Capacity:</strong>
-              {{ room.capacity }} guest{{ room.capacity === 1 ? "" : "s" }}
-            </p>
-
-            <p class="room-meta">
-              <strong>Size:</strong> {{ room.sizeSqm }} m²
-            </p>
-
-            <div class="extras">
-              <span v-for="extra in room.extras" :key="extra.id">
-                {{ getExtraIcon(extra.iconName) }} {{ extra.name }}
-              </span>
-            </div>
-          </div>
-
-          <div class="booking-box">
-            <h2>Select your stay</h2>
-
-            <p class="calendar-instruction">
-              {{ calendarInstruction }}
-            </p>
-
-            <ion-datetime
-              presentation="date"
-              :value="calendarValue"
-              @ionChange="selectCalendarDate($event.detail.value)"
-            ></ion-datetime>
-
-            <p v-if="dateError" class="error">
-              The check-out date cannot be before the check-in date.
-            </p>
-
-            <div
-              v-if="checkInDate && checkOutDate && !dateError"
-              class="selected-period"
-            >
-              <strong>Selected period:</strong>
-              <br />
-              {{ numberOfNights }} night{{ numberOfNights === 1 ? "" : "s" }} ·
-              {{ formatDate(checkInDate) }} → {{ formatDate(checkOutDate) }}
-
-              <button class="reset-button" @click="resetDates">
-                Reset
-              </button>
+          <article class="room-detail-card">
+            <div class="image-wrapper">
+              <img
+                :src="getMainImage(room)"
+                :alt="room.title"
+                class="room-image"
+              />
             </div>
 
-            <ion-button
-              expand="block"
-              :disabled="availabilityLoading"
-              @click="handleCheckAvailability"
-            >
-              Check availability
-            </ion-button>
+            <div class="room-content">
+              <p class="eyebrow">Selected room</p>
 
-            <p v-if="dateMissingError" class="error">
-              Please select a check-in and check-out date before checking
-              availability.
-            </p>
+              <h2>{{ room.title }}</h2>
 
-            <p v-if="availabilityLoading" class="hint">
-              Checking availability...
-            </p>
+              <p class="room-description">
+                {{ room.description }}
+              </p>
 
-            <div
-              v-if="availabilityChecked && isAvailable === true"
-              class="availability-result available"
-            >
-              ✅ This room is available for your selected period.
+              <div class="room-facts">
+                <div class="fact-box">
+                  <span>Price</span>
+                  <strong>€{{ room.pricePerNight }}</strong>
+                  <small>per night</small>
+                </div>
+
+                <div class="fact-box">
+                  <span>Capacity</span>
+                  <strong>{{ room.capacity }}</strong>
+                  <small> guest{{ room.capacity === 1 ? "" : "s" }} </small>
+                </div>
+
+                <div class="fact-box">
+                  <span>Size</span>
+                  <strong>{{ room.sizeSqm }}</strong>
+                  <small>m²</small>
+                </div>
+              </div>
+
+              <div class="extras-section">
+                <h3>Included extras</h3>
+
+                <div class="extras">
+                  <ExtraBadge
+                    v-for="extra in room.extras"
+                    :key="extra.id"
+                    :extra="extra"
+                  />
+                </div>
+              </div>
             </div>
+          </article>
 
-            <div
-              v-if="availabilityChecked && isAvailable === false"
-              class="availability-result unavailable"
-            >
-              ❌ This room is not available for your selected period.
-            </div>
-
-            <p v-if="availabilityError" class="error">
-              Availability could not be checked. Please try again later.
-            </p>
-          </div>
+          <aside class="booking-column">
+            <BookingWidget :room-id="Number(room.id)" />
+          </aside>
         </div>
       </section>
     </ion-content>
@@ -123,344 +92,246 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue"
-import { useRoute } from "vue-router"
-import AppHeader from "../components/AppHeader.vue"
+import { computed, onMounted } from "vue";
+import { useRoute } from "vue-router";
 
-import {
-  IonPage,
-  IonContent,
-  IonButton,
-  IonDatetime
-} from "@ionic/vue"
+import { IonPage, IonContent, IonButton } from "@ionic/vue";
 
-import {
-  getRoomById,
-  checkRoomAvailability,
-  type Room
-} from "../services/roomService"
+import AppHeader from "../components/AppHeader.vue";
+import ExtraBadge from "../components/atoms/ExtraBadge.vue";
+import BookingWidget from "../components/molecules/BookingWidget.vue";
 
-const route = useRoute()
-const roomId = route.params.id as string
+import { useRoomUtils } from "../composables/useRoomUtils";
+import { useRoomStore } from "../stores/roomStore";
 
-const room = ref<Room | null>(null)
-const loading = ref(false)
-const error = ref(false)
+const route = useRoute();
+const roomId = route.params.id as string;
 
-const checkInDate = ref("")
-const checkOutDate = ref("")
+const roomStore = useRoomStore();
 
-const availabilityLoading = ref(false)
-const availabilityError = ref(false)
-const availabilityChecked = ref(false)
-const isAvailable = ref<boolean | null>(null)
-const dateMissingError = ref(false)
+const room = computed(() => roomStore.selectedRoom);
+const loading = computed(() => roomStore.loading);
+const error = computed(() => roomStore.error);
 
-const calendarValue = computed(() => {
-  return checkOutDate.value || checkInDate.value || ""
-})
-
-const calendarInstruction = computed(() => {
-  if (!checkInDate.value) {
-    return "Select your check-in date."
-  }
-
-  if (!checkOutDate.value) {
-    return "Now select your check-out date."
-  }
-
-  return "Your stay period is selected. Click another date to start again."
-})
-
-const dateError = computed(() => {
-  if (!checkInDate.value || !checkOutDate.value) {
-    return false
-  }
-
-  return toApiDate(checkOutDate.value) < toApiDate(checkInDate.value)
-})
-
-const numberOfNights = computed(() => {
-  if (!checkInDate.value || !checkOutDate.value || dateError.value) {
-    return 0
-  }
-
-  const start = new Date(toApiDate(checkInDate.value) + "T00:00:00")
-  const end = new Date(toApiDate(checkOutDate.value) + "T00:00:00")
-
-  const difference = end.getTime() - start.getTime()
-
-  return difference / (1000 * 60 * 60 * 24)
-})
-
-async function loadRoom() {
-  loading.value = true
-  error.value = false
-
-  try {
-    room.value = await getRoomById(roomId)
-  } catch {
-    error.value = true
-  } finally {
-    loading.value = false
-  }
-}
-
-function selectCalendarDate(value: string | string[] | null | undefined) {
-  if (typeof value !== "string") {
-    return
-  }
-
-  if (!checkInDate.value || checkOutDate.value) {
-    checkInDate.value = value
-    checkOutDate.value = ""
-  } else {
-    checkOutDate.value = value
-  }
-
-  availabilityError.value = false
-  availabilityChecked.value = false
-  dateMissingError.value = false
-  isAvailable.value = null
-}
-
-function resetDates() {
-  checkInDate.value = ""
-  checkOutDate.value = ""
-
-  availabilityError.value = false
-  availabilityChecked.value = false
-  dateMissingError.value = false
-  isAvailable.value = null
-}
-
-function getMainImage(room: Room) {
-  const mainImage = room.images?.find((image) => image.isMainImage)
-
-  return (
-    mainImage?.url ||
-    "https://images.unsplash.com/photo-1566665797739-1674de7a421a"
-  )
-}
-
-function getExtraIcon(iconName: string) {
-  if (iconName === "wifi") return "📶"
-  if (iconName === "coffee") return "☕"
-  if (iconName === "car") return "🅿️"
-  if (iconName === "tv") return "📺"
-  if (iconName === "wind") return "❄️"
-  if (iconName === "spa") return "🧖"
-
-  return "✨"
-}
-
-function formatDate(date: string) {
-  if (!date) {
-    return ""
-  }
-
-  const dateOnly = toApiDate(date)
-  const dateObject = new Date(dateOnly + "T00:00:00")
-
-  return dateObject.toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric"
-  })
-}
-
-async function handleCheckAvailability() {
-  dateMissingError.value = false
-  availabilityError.value = false
-  availabilityChecked.value = false
-  isAvailable.value = null
-
-  if (!checkInDate.value || !checkOutDate.value) {
-    dateMissingError.value = true
-    return
-  }
-
-  if (dateError.value) {
-    return
-  }
-
-  availabilityLoading.value = true
-
-  try {
-    const result = await checkRoomAvailability(
-      roomId,
-      toApiDate(checkInDate.value),
-      toApiDate(checkOutDate.value)
-    )
-
-    isAvailable.value = result.available
-    availabilityChecked.value = true
-  } catch {
-    availabilityError.value = true
-  } finally {
-    availabilityLoading.value = false
-  }
-}
-
-function toApiDate(date: string) {
-  if (!date) {
-    return ""
-  }
-
-  return date.split("T")[0]
-}
+const { getMainImage } = useRoomUtils();
 
 onMounted(() => {
-  loadRoom()
-})
+  roomStore.loadRoomById(roomId);
+});
 </script>
 
 <style scoped>
 .detail-page {
-  padding: 20px;
-  max-width: 1100px;
-  margin: 0 auto;
+  min-height: 100%;
+  padding: 18px 22px 32px;
+  background: linear-gradient(180deg, #f4f7f5 0%, #ffffff 45%);
 }
 
-h1 {
-  font-size: 32px;
-  margin-bottom: 24px;
+.detail-page > * {
+  max-width: 1180px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.back-button {
+  --color: var(--ion-color-primary, #207868);
+  margin-bottom: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.detail-hero {
+  background:
+    linear-gradient(135deg, rgba(35, 83, 71, 0.94), rgba(32, 120, 104, 0.88)),
+    url("https://images.unsplash.com/photo-1566073771259-6a8506099945");
+  background-size: cover;
+  background-position: center;
+  color: #ffffff;
+  border-radius: 24px;
+  padding: 22px 28px;
+  margin-bottom: 22px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
+}
+
+.eyebrow {
+  color: #f4d35e;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin: 0 0 10px;
+}
+.detail-hero h1 {
+  font-size: 34px;
+  line-height: 1.1;
+  margin: 0 0 8px;
+  color: #ffffff;
+}
+
+.detail-hero p {
+  max-width: 720px;
+  font-size: 16px;
+  line-height: 1.5;
+  margin: 0;
+  color: #ffffff;
+}
+
+.status-text {
+  color: #555555;
+  font-size: 16px;
+}
+
+.error {
+  color: darkred;
+  background-color: #ffebee;
+  padding: 14px 16px;
+  border-radius: 12px;
 }
 
 .detail-layout {
   display: grid;
   grid-template-columns: 1fr;
   gap: 24px;
+  align-items: start;
 }
 
-.room-info,
-.booking-box {
-  background: var(--ion-card-background, #ffffff);
-  border-radius: 16px;
-  padding: 20px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+.room-detail-card {
+  background: #ffffff;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.08);
+}
+
+.image-wrapper {
+  background-color: #eeeeee;
 }
 
 .room-image {
   width: 100%;
-  height: 260px;
+  height: 330px;
   object-fit: cover;
-  border-radius: 12px;
-  margin-bottom: 16px;
+  display: block;
 }
 
-.room-meta {
-  color: #555;
-  margin-bottom: 8px;
+.room-content {
+  padding: 26px;
+}
+
+.room-content .eyebrow {
+  color: var(--ion-color-primary, #207868);
+}
+
+.room-content h2 {
+  font-size: 34px;
+  margin: 0 0 14px;
+  color: #222222;
+}
+
+.room-description {
+  font-size: 17px;
+  line-height: 1.7;
+  color: #555555;
+  margin-bottom: 22px;
+}
+
+.room-facts {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin-bottom: 26px;
+}
+
+.fact-box {
+  background-color: #f6fbf9;
+  border-left: 5px solid var(--ion-color-primary, #207868);
+  border-radius: 14px;
+  padding: 16px;
+}
+
+.fact-box span {
+  display: block;
+  color: #666666;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 6px;
+}
+
+.fact-box strong {
+  display: block;
+  color: #222222;
+  font-size: 26px;
+  line-height: 1.1;
+}
+
+.fact-box small {
+  color: #666666;
+}
+
+.extras-section h3 {
+  font-size: 20px;
+  margin: 0 0 12px;
+  color: #222222;
 }
 
 .extras {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 16px;
+  gap: 10px;
 }
 
-.extras span {
-  background-color: #eeeeee;
-  color: #222222;
-  padding: 6px 10px;
-  border-radius: 12px;
-  font-size: 14px;
-}
-
-.booking-box ion-button {
-  margin-top: 16px;
-}
-
-.calendar-instruction {
-  color: #555;
-  font-size: 15px;
-  margin-bottom: 12px;
-}
-
-.booking-box ion-datetime {
-  width: 100%;
-  max-width: 360px;
-  margin: 0 auto 16px;
-}
-
-.error {
-  color: darkred;
-  margin: 12px 0;
-}
-
-.selected-period {
-  background-color: #f3f3f3;
-  color: #222222;
-  padding: 12px;
-  border-radius: 12px;
-  margin: 16px 0;
-  line-height: 1.5;
-}
-
-.reset-button {
-  display: block;
-  margin-top: 12px;
-  border: none;
-  background: transparent;
-  color: #0054e9;
-  text-decoration: underline;
-  font-size: 15px;
-  cursor: pointer;
-  padding: 0;
-}
-
-.hint {
-  color: #666;
-  font-size: 14px;
-  margin-top: 12px;
-}
-
-.availability-result {
-  padding: 12px;
-  border-radius: 12px;
-  margin-top: 16px;
-  line-height: 1.5;
-  font-weight: 500;
-}
-
-.availability-result.available {
-  background-color: #e8f5e9;
-  color: #1b5e20;
-}
-
-.availability-result.unavailable {
-  background-color: #ffebee;
-  color: #b71c1c;
+.booking-column {
+  position: relative;
 }
 
 @media (min-width: 768px) {
   .detail-page {
-    padding: 48px;
-  }
-
-  h1 {
-    font-size: 42px;
+    padding: 28px 42px 42px;
   }
 
   .detail-layout {
-    grid-template-columns: 2fr 1fr;
-    align-items: start;
+    grid-template-columns: minmax(0, 2fr) 390px;
+  }
+
+  .booking-column {
+    position: sticky;
+    top: 24px;
+  }
+
+  .room-facts {
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
 @media (max-width: 480px) {
   .detail-page {
-    padding: 16px;
+    padding: 14px;
   }
 
-  h1 {
-    font-size: 30px;
+  .detail-hero {
+    padding: 20px;
+    border-radius: 20px;
+  }
+
+  .detail-hero h1 {
+    font-size: 28px;
+  }
+
+  .detail-hero p {
+    font-size: 16px;
   }
 
   .room-image {
-    height: 220px;
+    height: 230px;
+  }
+
+  .room-content {
+    padding: 20px;
+  }
+
+  .room-content h2 {
+    font-size: 28px;
   }
 }
 </style>

@@ -1,15 +1,15 @@
 <template>
   <ion-header>
     <ion-toolbar>
-      <ion-title>Hotel Technikum</ion-title>
+      <ion-title>Hotel Boutique</ion-title>
     </ion-toolbar>
 
     <ion-toolbar class="nav-toolbar">
       <ion-buttons class="nav-buttons">
-        <ion-button router-link="/home">Home</ion-button>
-        <ion-button router-link="/rooms">Rooms</ion-button>
-        <ion-button router-link="/about">About</ion-button>
-        <ion-button router-link="/imprint">Imprint</ion-button>
+        <ion-button :router-link="{ name: 'home' }">Home</ion-button>
+        <ion-button :router-link="{ name: 'rooms' }">Rooms</ion-button>
+        <ion-button :router-link="{ name: 'about' }">About</ion-button>
+        <ion-button :router-link="{ name: 'imprint' }">Imprint</ion-button>
       </ion-buttons>
     </ion-toolbar>
   </ion-header>
@@ -21,8 +21,8 @@ import {
   IonToolbar,
   IonTitle,
   IonButtons,
-  IonButton
-} from '@ionic/vue'
+  IonButton,
+} from "@ionic/vue";
 </script>
 
 <style scoped>

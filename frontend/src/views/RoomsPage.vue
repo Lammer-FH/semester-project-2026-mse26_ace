@@ -4,46 +4,31 @@
 
     <ion-content>
       <section class="rooms-page">
-        <h1>Our Rooms</h1>
+        <div class="rooms-hero">
+          <p class="eyebrow">Hotel Technikum</p>
 
-        <p class="intro">
-          Discover our available rooms and choose the one that fits your stay best.
+          <h1>Our Rooms</h1>
+
+          <p class="intro">
+            Discover our available rooms and choose the one that fits your stay
+            best.
+          </p>
+        </div>
+
+        <p v-if="loading" class="status-text">
+          Loading rooms...
         </p>
-
-        <p v-if="loading">Loading rooms...</p>
 
         <p v-if="error" class="error">
           Rooms could not be loaded. Please try again later.
         </p>
 
         <div v-if="!loading && !error" class="room-grid">
-          <ion-card v-for="room in visibleRooms" :key="room.id" class="room-card">
-            <img :src="getMainImage(room)" :alt="room.title" />
-
-            <ion-card-header>
-              <ion-card-title>{{ room.title }}</ion-card-title>
-            </ion-card-header>
-
-            <ion-card-content>
-              <p>{{ room.description }}</p>
-
-              <p class="room-meta">
-                {{ room.capacity }} guest{{ room.capacity === 1 ? '' : 's' }} ·
-                {{ room.sizeSqm }} m² ·
-                €{{ room.pricePerNight }} / night
-              </p>
-
-              <div class="extras">
-                <span v-for="extra in room.extras" :key="extra.id">
-                  {{ getExtraIcon(extra.iconName) }} {{ extra.name }}
-                </span>
-              </div>
-
-              <ion-button expand="block" :router-link="`/rooms/${room.id}`">
-                View details
-              </ion-button>
-            </ion-card-content>
-          </ion-card>
+          <RoomCard
+            v-for="room in visibleRooms"
+            :key="room.id"
+            :room="room"
+          />
         </div>
 
         <div v-if="!loading && !error && totalPages > 1" class="pagination">
@@ -63,51 +48,36 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
-import AppHeader from '../components/AppHeader.vue'
+import { computed, onMounted, ref } from "vue"
 
 import {
   IonPage,
   IonContent,
-  IonButton,
-  IonCard,
-  IonCardHeader,
-  IonCardTitle,
-  IonCardContent
-} from '@ionic/vue'
+  IonButton
+} from "@ionic/vue"
 
-import { getRooms, type Room } from '../services/roomService'
+import AppHeader from "../components/AppHeader.vue"
+import RoomCard from "../components/molecules/RoomCard.vue"
+import { useRoomStore } from "../stores/roomStore"
 
-const loading = ref(false)
-const error = ref(false)
+const roomStore = useRoomStore()
+
 const currentPage = ref(1)
 const roomsPerPage = 5
 
-const rooms = ref<Room[]>([])
-
 const totalPages = computed(() => {
-  return Math.ceil(rooms.value.length / roomsPerPage)
+  return Math.ceil(roomStore.rooms.length / roomsPerPage)
 })
 
 const visibleRooms = computed(() => {
   const start = (currentPage.value - 1) * roomsPerPage
   const end = start + roomsPerPage
 
-  return rooms.value.slice(start, end)
+  return roomStore.rooms.slice(start, end)
 })
 
-async function loadRooms() {
-  loading.value = true
-  error.value = false
-
-  try {
-    rooms.value = await getRooms()
-  } catch {
-    error.value = true
-  } finally {
-    loading.value = false
-  }
-}
+const loading = computed(() => roomStore.loading)
+const error = computed(() => roomStore.error)
 
 function nextPage() {
   if (currentPage.value < totalPages.value) {
@@ -121,85 +91,70 @@ function previousPage() {
   }
 }
 
-function getMainImage(room: Room) {
-  const mainImage = room.images?.find((image) => image.isMainImage)
-
-  return mainImage?.url || 'https://images.unsplash.com/photo-1566665797739-1674de7a421a'
-}
-
-function getExtraIcon(iconName: string) {
-  if (iconName === 'wifi') return '📶'
-  if (iconName === 'coffee') return '☕'
-  if (iconName === 'car') return '🅿️'
-  if (iconName === 'tv') return '📺'
-  if (iconName === 'wind') return '❄️'
-  if (iconName === 'spa') return '🧖'
-
-  return '✨'
-}
-
 onMounted(() => {
-  loadRooms()
+  roomStore.loadRooms()
 })
 </script>
 
 <style scoped>
 .rooms-page {
-  padding: 24px;
-  max-width: 1100px;
+  padding: 20px;
+  max-width: 1200px;
   margin: 0 auto;
 }
 
+.rooms-hero {
+  background:
+    linear-gradient(135deg, rgba(35, 83, 71, 0.94), rgba(32, 120, 104, 0.86)),
+    url("https://images.unsplash.com/photo-1566073771259-6a8506099945");
+  background-size: cover;
+  background-position: center;
+  border-radius: 26px;
+  padding: 32px;
+  margin-bottom: 28px;
+  color: #ffffff;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
+}
+
+.eyebrow {
+  color: #f4d35e;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin: 0 0 10px;
+}
+
 h1 {
-  font-size: 32px;
-  margin-bottom: 8px;
+  font-size: 36px;
+  margin: 0 0 12px;
+  color: #ffffff;
 }
 
 .intro {
   font-size: 18px;
-  color: #555;
-  margin-bottom: 24px;
+  line-height: 1.6;
+  color: #ffffff;
+  max-width: 720px;
+  margin: 0;
+}
+
+.status-text {
+  font-size: 16px;
+  color: #555555;
 }
 
 .error {
   color: darkred;
+  background-color: #ffebee;
+  padding: 14px 16px;
+  border-radius: 12px;
 }
 
 .room-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 20px;
-}
-
-.room-card {
-  margin: 0;
-}
-
-.room-card img {
-  width: 100%;
-  height: 220px;
-  object-fit: cover;
-}
-
-.room-meta {
-  color: #666;
-  font-size: 14px;
-  margin-top: 12px;
-}
-
-.extras {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin: 12px 0 16px;
-}
-
-.extras span {
-  background-color: #eeeeee;
-  color: #222222;
-  padding: 6px 10px;
-  border-radius: 12px;
-  font-size: 14px;
+  gap: 24px;
 }
 
 .pagination {
@@ -207,7 +162,12 @@ h1 {
   justify-content: center;
   align-items: center;
   gap: 16px;
-  margin-top: 32px;
+  margin-top: 34px;
+}
+
+.pagination span {
+  font-weight: 600;
+  color: #444444;
 }
 
 @media (min-width: 768px) {
@@ -215,8 +175,12 @@ h1 {
     padding: 48px;
   }
 
+  .rooms-hero {
+    padding: 46px;
+  }
+
   h1 {
-    font-size: 42px;
+    font-size: 48px;
   }
 
   .room-grid {
@@ -224,9 +188,28 @@ h1 {
   }
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1100px) {
   .room-grid {
     grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .rooms-page {
+    padding: 16px;
+  }
+
+  .rooms-hero {
+    padding: 26px;
+  }
+
+  h1 {
+    font-size: 34px;
+  }
+
+  .pagination {
+    flex-direction: column;
+    gap: 10px;
   }
 }
 </style>
